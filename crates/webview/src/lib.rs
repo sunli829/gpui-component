@@ -1,4 +1,4 @@
-//! WebView support for GPUI.
+#![doc = include_str!("../README.md")]
 
 mod browser_handler;
 mod context_menu;
