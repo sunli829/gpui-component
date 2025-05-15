@@ -7,7 +7,7 @@ mod frame_view;
 mod utils;
 mod webview;
 
-pub mod event;
+pub mod events;
 
 pub use webview::WebView;
 pub use wef;

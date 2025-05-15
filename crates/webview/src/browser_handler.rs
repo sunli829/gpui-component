@@ -10,7 +10,7 @@ use wef::{
 use crate::{
     WebView,
     context_menu::{ContextMenuInfo, build_context_menu},
-    event::*,
+    events::*,
     frame_view::FrameView,
     utils::from_wef_cursor_type,
 };

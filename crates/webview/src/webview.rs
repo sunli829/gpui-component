@@ -11,7 +11,7 @@ use crate::{
     browser_handler::WebViewHandler,
     context_menu::{ContextMenuAction, ContextMenuInfo},
     element::WebViewElement,
-    event::*,
+    events::*,
     frame_view::FrameView,
     utils::*,
 };

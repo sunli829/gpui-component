@@ -7,7 +7,7 @@ use gpui::{
 use gpui_component::Root;
 use gpui_webview::{
     WebView,
-    event::TitleChangedEvent,
+    events::TitleChangedEvent,
     wef::{self, FuncRegistry, Settings},
 };
 
