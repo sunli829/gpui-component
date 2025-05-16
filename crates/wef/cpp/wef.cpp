@@ -67,7 +67,7 @@ bool wef_init(const WefSettings* wef_settings) {
 }
 
 bool wef_exec_process() {
-  CefRefPtr<WefRenderProcessHandler> app(new WefRenderProcessHandler());
+  CefRefPtr<WefRenderProcessApp> app(new WefRenderProcessApp());
   return CefExecuteProcess(CefMainArgs(), app, nullptr) >= 0;
 }
 
