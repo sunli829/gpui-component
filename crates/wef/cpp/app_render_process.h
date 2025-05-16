@@ -38,16 +38,15 @@ class WefRenderProcessHandler : public CefRenderProcessHandler {
   }
 };
 
-class LbRenderProcessCefApp : public CefApp, public CefRenderProcessHandler {
-  IMPLEMENT_REFCOUNTING(LbRenderProcessCefApp);
+class WefRenderProcessApp : public CefApp, public CefRenderProcessHandler {
+  IMPLEMENT_REFCOUNTING(WefRenderProcessApp);
 
  private:
   CefRefPtr<CefRenderProcessHandler> render_process_handler_;
 
  public:
-  LbRenderProcessCefApp() {
-    render_process_handler_ = new WefRenderProcessHandler();
-  }
+  WefRenderProcessApp()
+      : render_process_handler_(new WefRenderProcessHandler()) {}
 
   CefRefPtr<CefRenderProcessHandler> GetRenderProcessHandler() {
     return render_process_handler_;
