@@ -76,8 +76,8 @@ struct App {
 
 impl App {
     #[inline]
-    fn browser_mut(&mut self) -> &mut Browser {
-        &mut self.state.as_mut().unwrap().browser
+    fn browser(&mut self) -> &Browser {
+        &self.state.as_ref().unwrap().browser
     }
 }
 
@@ -103,12 +103,12 @@ impl ApplicationHandler for App {
             WindowEvent::CloseRequested => event_loop.exit(),
             WindowEvent::Resized(size) => {
                 // Resize the render target
-                self.browser_mut().resize(size.width, size.height);
+                self.browser().resize(size.width, size.height);
             }
             WindowEvent::CursorMoved { position, .. } => {
                 let scale_factor = self.state.as_ref().unwrap().scale_factor;
                 let position = position.to_logical::<f32>(scale_factor as f64);
-                self.browser_mut()
+                self.browser()
                     .send_mouse_move_event(position.x as i32, position.y as i32);
             }
             WindowEvent::MouseInput { state, button, .. } => {
@@ -119,15 +119,14 @@ impl ApplicationHandler for App {
                     _ => return,
                 };
                 let pressed = state.is_pressed();
-                self.browser_mut()
-                    .send_mouse_click_event(button, !pressed, 1);
+                self.browser().send_mouse_click_event(button, !pressed, 1);
             }
             WindowEvent::MouseWheel { delta, .. } => {
                 let (delta_x, delta_y) = match delta {
                     MouseScrollDelta::LineDelta(x, y) => (50 * x as i32, 50 * y as i32),
                     MouseScrollDelta::PixelDelta(delta) => (delta.x as _, delta.y as _),
                 };
-                self.browser_mut().send_mouse_wheel_event(delta_x, delta_y);
+                self.browser().send_mouse_wheel_event(delta_x, delta_y);
             }
             WindowEvent::ModifiersChanged(modifiers) => {
                 self.key_modifiers = convert_key_modifiers(modifiers);
@@ -136,7 +135,7 @@ impl ApplicationHandler for App {
                 winit::keyboard::Key::Named(named_key) => {
                     if let Some(key_code) = convert_key_code(named_key) {
                         let key_modifiers = self.key_modifiers;
-                        self.browser_mut().send_key_event(
+                        self.browser().send_key_event(
                             event.state.is_pressed(),
                             key_code,
                             key_modifiers,
@@ -145,7 +144,7 @@ impl ApplicationHandler for App {
                 }
                 winit::keyboard::Key::Character(s) if event.state.is_pressed() => {
                     for ch in s.chars() {
-                        self.browser_mut().send_char_event(ch as u16);
+                        self.browser().send_char_event(ch as u16);
                     }
                 }
                 _ => {}
@@ -153,9 +152,9 @@ impl ApplicationHandler for App {
             WindowEvent::Ime(ime) => match ime {
                 Ime::Preedit(text, range) => {
                     let (start, end) = range.unwrap_or_default();
-                    self.browser_mut().ime_set_composition(&text, start, end);
+                    self.browser().ime_set_composition(&text, start, end);
                 }
-                Ime::Commit(text) => self.browser_mut().ime_commit(&text),
+                Ime::Commit(text) => self.browser().ime_commit(&text),
                 _ => {}
             },
             WindowEvent::RedrawRequested => {

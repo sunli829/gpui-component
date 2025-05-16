@@ -3,6 +3,7 @@ members = [
     "crates/story",
     "crates/ui",
     "crates/wef",
+    "crates/wef/tool",
     "crates/wef/examples/wef-winit-example",
     "crates/webview",
     "crates/webview/examples/wef-gpui-example",
