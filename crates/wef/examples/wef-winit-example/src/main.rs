@@ -2,8 +2,8 @@ use std::{cell::RefCell, rc::Rc, time::Duration};
 
 use softbuffer::Surface;
 use wef::{
-    Browser, BrowserHandler, DirtyRects, ImageBuffer, KeyCode, KeyModifier, MouseButton,
-    PaintElementType, Rect, Settings, Size,
+    Browser, BrowserHandler, DirtyRects, FrameworkLoader, ImageBuffer, KeyCode, KeyModifier,
+    MouseButton, PaintElementType, Rect, Settings, Size,
 };
 use winit::{
     application::ApplicationHandler,
@@ -297,10 +297,14 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    #[cfg(not(target_os = "macos"))]
     if wef::exec_process()? {
         // Is helper process, exit immediately
         return Ok(());
     }
+
+    #[cfg(target_os = "macos")]
+    let _ = FrameworkLoader::load_in_main()?;
 
     // Run the main process
     let settings = Settings::new();
