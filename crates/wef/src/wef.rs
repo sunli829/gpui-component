@@ -85,3 +85,49 @@ pub fn shutdown() {
 pub fn do_message_loop_work() {
     unsafe { wef_do_message_loop_work() };
 }
+
+/// Launch the Wef application.
+///
+/// This function initializes the CEF library and runs the main process.
+/// It is a convenience function that combines the [`init`] and [`shutdown`]
+/// functions.
+///
+/// On macOS, it also loads the CEF framework using the [`FrameworkLoader`].
+///
+/// # Panics
+///
+/// This function panics if the CEF library fails to initialize or if the
+/// CEF framework fails to load on macOS.
+///
+/// # Examples
+///
+/// ```rust, no_run
+/// use wef::{AppHandler, Settings};
+///
+/// fn main() {
+///     let settings = Settings::default();
+///     launch(settings, || {
+///         // do something in the main process
+///     });
+/// }
+/// ```
+pub fn launch<T, F, R>(settings: Settings<T>, f: F) -> R
+where
+    T: AppHandler,
+    F: FnOnce() -> R,
+{
+    #[cfg(not(target_os = "macos"))]
+    if exec_process().expect("failed to execute process") {
+        // Is helper process, exit immediately
+        std::process::exit(0);
+    }
+
+    #[cfg(target_os = "macos")]
+    let _ = FrameworkLoader::load_in_main().expect("failed to load CEF framework");
+
+    // Run the main process
+    init(settings).expect("failed to initialize CEF");
+    let res = f();
+    shutdown();
+    res
+}

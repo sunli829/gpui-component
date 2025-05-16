@@ -59,14 +59,7 @@ impl Render for Main {
     }
 }
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    if wef::exec_process()? {
-        return Ok(());
-    }
-
-    let settings = Settings::new();
-    wef::init(settings)?;
-
+fn run() {
     Application::new().run(|cx: &mut App| {
         gpui_component::init(cx);
 
@@ -84,7 +77,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .unwrap();
         cx.activate(true);
     });
+}
 
-    wef::shutdown();
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    wef::launch(Settings::new(), run);
     Ok(())
 }
