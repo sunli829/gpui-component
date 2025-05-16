@@ -60,6 +60,6 @@ pub(crate) fn add_cef_framework(settings: &AddCefFrameworkSettings) -> Result<()
         ));
     })?;
 
-    println!("{}", "Successfully!".bright_green());
+    println!("{}", "Successfully!".green());
     Ok(())
 }

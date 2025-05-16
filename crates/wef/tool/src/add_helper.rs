@@ -32,7 +32,7 @@ pub(crate) struct AddHelperSettings {
 /// wef = "{{ wef_version }}"
 /// {% endif %}
 /// {% if let Some(wef_path) = wef_path %}
-/// wef = { path =  {{ wef_path }} }
+/// wef = { path = "{{ wef_path }}" }
 /// {% endif %}
 /// ```
 #[derive(Template)]
@@ -44,6 +44,7 @@ struct TemplateCargoToml {
 
 const MAIN_RS: &str = r#"
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let _ = wef::FrameworkLoader::load_in_helper()?;
     wef::exec_process()?;
     Ok(())
 }
@@ -128,12 +129,21 @@ fn query_wef_max_stable_version() -> Result<String> {
         max_stable_version: String,
     }
 
-    Ok(
-        reqwest::blocking::get("https://crates.io/api/v1/crates/wef")?
-            .error_for_status()?
-            .json::<CrateInfo>()?
-            .max_stable_version,
-    )
+    #[derive(Debug, Deserialize)]
+    struct Response {
+        #[serde(rename = "crate")]
+        crate_: CrateInfo,
+    }
+
+    let client = reqwest::blocking::Client::new();
+    Ok(client
+        .get("https://crates.io/api/v1/crates/wef")
+        .header("user-agent", "curl/8.7.1")
+        .send()?
+        .error_for_status()?
+        .json::<Response>()?
+        .crate_
+        .max_stable_version)
 }
 
 fn create_helper_bin<F, R>(settings: &AddHelperSettings, callback: F) -> Result<R>
@@ -150,9 +160,9 @@ where
         (None, Some(wef_path.display().to_string()))
     } else {
         let wef_version = settings.wef_version.clone().map(Ok).unwrap_or_else(|| {
-            println!("Querying crates.io for the latest stable version of wef...");
+            println!("Querying crates.io for the latest stable version of Wef...");
             query_wef_max_stable_version().inspect_err(|err| {
-                print_error(format_args!("failed to query wef version: {}", err));
+                print_error(format_args!("failed to query Wef version: {}", err));
             })
         })?;
         println!("Using Wef version: {}", wef_version);
@@ -303,11 +313,11 @@ fn create_helper_app(
     })?;
 
     // create MacOS directory
-    let macos_path = helper_app_path.join("MacOS");
-    std::fs::create_dir_all(&contents_path).inspect_err(|err| {
+    let macos_path = contents_path.join("MacOS");
+    std::fs::create_dir_all(&macos_path).inspect_err(|err| {
         print_error(format_args!(
             "failed to create directory {}: {}",
-            contents_path.display(),
+            macos_path.display(),
             err
         ));
     })?;
@@ -334,7 +344,7 @@ pub(crate) fn add_helper(settings: &AddHelperSettings) -> Result<()> {
     );
 
     let info_path = settings.app_path.join("Contents").join("Info.plist");
-    let bundle_info = read_bundle_info(&settings.app_path).inspect_err(|err| {
+    let bundle_info = read_bundle_info(&info_path).inspect_err(|err| {
         print_error(format_args!(
             "failed to read {}: {}",
             info_path.display(),
@@ -352,6 +362,6 @@ pub(crate) fn add_helper(settings: &AddHelperSettings) -> Result<()> {
         Ok(())
     })?;
 
-    println!("{}", "Successfully!".bright_green());
+    println!("{}", "Successfully!".green());
     Ok(())
 }
