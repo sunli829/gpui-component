@@ -70,7 +70,7 @@ bool wef_exec_process(char* argv[], int argc) {
 #ifdef WIN32
   CefMainArgs args(GetModuleHandle(NULL));
 #else
-  CefMainArgs args(argv, argc);
+  CefMainArgs args(argc, argv);
 #endif
 
   CefRefPtr<WefRenderProcessApp> app(new WefRenderProcessApp());
