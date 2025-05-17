@@ -122,7 +122,7 @@ unsafe extern "C" {
 
     pub(crate) unsafe fn wef_init(settings: *const CSettings) -> bool;
 
-    pub(crate) unsafe fn wef_exec_process() -> bool;
+    pub(crate) unsafe fn wef_exec_process(args: *const *const c_char, count: i32) -> bool;
 
     pub(crate) unsafe fn wef_shutdown();
 

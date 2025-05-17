@@ -1,4 +1,4 @@
-use std::ffi::c_void;
+use std::ffi::{CString, c_char, c_void};
 
 use crate::{AppHandler, Error, ffi::*, settings::Settings};
 
@@ -63,7 +63,11 @@ where
 /// }
 /// ```
 pub fn exec_process() -> Result<bool, Error> {
-    Ok(unsafe { wef_exec_process() })
+    let args: Vec<CString> = std::env::args()
+        .filter_map(|arg| CString::new(arg).ok())
+        .collect();
+    let c_args: Vec<*const c_char> = args.iter().map(|arg| arg.as_ptr()).collect();
+    Ok(unsafe { wef_exec_process(c_args.as_ptr(), args.len() as i32) })
 }
 
 /// Shuts down the CEF library.

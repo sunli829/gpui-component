@@ -66,9 +66,15 @@ bool wef_init(const WefSettings* wef_settings) {
   return CefInitialize(CefMainArgs(), settings, app, nullptr);
 }
 
-bool wef_exec_process() {
+bool wef_exec_process(char* argv[], int argc) {
+#ifdef WIN32
+  CefMainArgs args(GetModuleHandle(NULL));
+#else
+  CefMainArgs args(argv, argc);
+#endif
+
   CefRefPtr<WefRenderProcessApp> app(new WefRenderProcessApp());
-  return CefExecuteProcess(CefMainArgs(), app, nullptr) >= 0;
+  return CefExecuteProcess(args, app, nullptr) >= 0;
 }
 
 void wef_shutdown() { CefShutdown(); }
