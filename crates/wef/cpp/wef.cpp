@@ -84,6 +84,7 @@ void wef_do_message_loop_work() { CefDoMessageLoopWork(); }
 WefBrowser* wef_browser_create(const WefBrowserSettings* settings) {
   CefWindowInfo window_info;
   window_info.SetAsWindowless(static_cast<CefWindowHandle>(settings->parent));
+  window_info.runtime_style = CEF_RUNTIME_STYLE_ALLOY;
 
   CefBrowserSettings browser_settings;
   browser_settings.windowless_frame_rate = settings->frame_rate;
