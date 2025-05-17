@@ -127,7 +127,7 @@ where
     }
 
     #[cfg(target_os = "macos")]
-    let _ = FrameworkLoader::load_in_main().expect("failed to load CEF framework");
+    let _ = crate::FrameworkLoader::load_in_main().expect("failed to load CEF framework");
 
     // Run the main process
     init(settings).expect("failed to initialize CEF");
