@@ -1,4 +1,4 @@
-use std::{cell::RefCell, rc::Rc, time::Duration};
+use std::{cell::RefCell, rc::Rc, thread::sleep, time::Duration};
 
 use softbuffer::Surface;
 use wef::{
@@ -101,10 +101,7 @@ impl ApplicationHandler for App {
     ) {
         match event {
             WindowEvent::CloseRequested => event_loop.exit(),
-            WindowEvent::Resized(size) => {
-                // Resize the render target
-                self.browser().resize(size.width, size.height);
-            }
+            WindowEvent::Resized(size) => self.browser().resize(size.width, size.height),
             WindowEvent::CursorMoved { position, .. } => {
                 let scale_factor = self.state.as_ref().unwrap().scale_factor;
                 let position = position.to_logical::<f32>(scale_factor as f64);
@@ -285,12 +282,14 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     let mut app = App::default();
 
     loop {
-        let status = event_loop.pump_app_events(Some(Duration::from_millis(10)), &mut app);
+        let status = event_loop.pump_app_events(None, &mut app);
         wef::do_message_loop_work();
 
         if let PumpStatus::Exit(_) = status {
             break;
         }
+
+        sleep(Duration::from_millis(16));
     }
 
     Ok(())
