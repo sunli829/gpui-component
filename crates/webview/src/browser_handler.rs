@@ -1,7 +1,11 @@
 use std::{rc::Rc, sync::Arc};
 
 use gpui::{AnyWindowHandle, AppContext, AsyncApp, ParentElement, RenderImage, Styled, WeakEntity};
-use gpui_component::{ContextModal, input::TextInput, v_flex};
+use gpui_component::{
+    ContextModal,
+    input::{InputState, TextInput},
+    v_flex,
+};
 use wef::{
     BrowserHandler, ContextMenuParams, CursorInfo, CursorType, DirtyRects, Frame, ImageBuffer,
     JsDialogCallback, JsDialogType, LogSeverity, LogicalUnit, PaintElementType, Point, Rect,
@@ -297,11 +301,8 @@ impl BrowserHandler for WebViewHandler {
                     default_prompt_text,
                 } => {
                     let default_prompt_text = default_prompt_text.to_string();
-                    let input = cx.new(|cx| {
-                        let mut input = TextInput::new(window, cx);
-                        input.set_text(default_prompt_text, window, cx);
-                        input
-                    });
+                    let input_state =
+                        cx.new(|cx| InputState::new(window, cx).default_value(default_prompt_text));
                     window.open_modal(cx, move |modal, _, _| {
                         modal
                             .footer(move |ok, cancel, window, cx| {
@@ -311,14 +312,13 @@ impl BrowserHandler for WebViewHandler {
                                 v_flex()
                                     .gap_3()
                                     .child(message_text.clone())
-                                    .child(input.clone()),
+                                    .child(TextInput::new(&input_state)),
                             )
                             .on_ok({
                                 let callback = callback.clone();
-                                let input = input.clone();
+                                let input_state = input_state.clone();
                                 move |_, _, cx| {
-                                    let input = input.read(cx);
-                                    callback.continue_(true, Some(input.text()));
+                                    callback.continue_(true, Some(input_state.read(cx).value()));
                                     true
                                 }
                             })

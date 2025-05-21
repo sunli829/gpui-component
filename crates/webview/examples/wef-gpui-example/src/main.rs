@@ -6,7 +6,7 @@ use gpui::{
 };
 use gpui_component::{
     Root,
-    input::{InputEvent, TextInput},
+    input::{InputEvent, InputState, TextInput},
 };
 use gpui_webview::{
     WebView,
@@ -16,7 +16,7 @@ use gpui_webview::{
 use serde::Serialize;
 
 struct Main {
-    address_input: Entity<TextInput>,
+    address_state: Entity<InputState>,
     webview: Entity<WebView>,
 }
 
@@ -65,19 +65,15 @@ impl Main {
                 .detach();
 
             // create address input
-            let address_input = cx.new(|cx| {
-                let mut address_input = TextInput::new(window, cx);
-                address_input.set_text("https://www.rust-lang.org", window, cx);
-                address_input
-            });
+            let address_state =
+                cx.new(|cx| InputState::new(window, cx).default_value("https://www.rust-lang.org"));
 
             window
-                .subscribe(&address_input, cx, {
+                .subscribe(&address_state, cx, {
                     let webview = webview.clone();
-                    let address_input = address_input.clone();
-                    move |_, event: &InputEvent, _, cx| {
+                    move |state, event: &InputEvent, _, cx| {
                         if let InputEvent::PressEnter { .. } = event {
-                            let url = address_input.read(cx).text();
+                            let url = state.read(cx).value();
                             webview.read(cx).browser().load_url(url);
                         }
                     }
@@ -85,7 +81,7 @@ impl Main {
                 .detach();
 
             Self {
-                address_input,
+                address_state,
                 webview,
             }
         })
@@ -96,7 +92,7 @@ impl Render for Main {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         div()
             .size_full()
-            .child(self.address_input.clone())
+            .child(TextInput::new(&self.address_state))
             .child(self.webview.clone())
             .children(Root::render_modal_layer(window, cx))
     }
