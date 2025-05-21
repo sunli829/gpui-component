@@ -6,6 +6,7 @@ authors = ["sunli <scott_s829@163.com>"]
 license = "Apache-2.0"
 homepage = "https://github.com/longbridge/gpui-component"
 repository = "https://github.com/longbridge/gpui-component"
+description = "wef tool is a command line tool for wef"
 
 [dependencies]
 clap = { version = "4.5.38", features = ["derive", "env"] }

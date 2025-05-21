@@ -6,6 +6,7 @@ authors = ["sunli <scott_s829@163.com>"]
 license = "Apache-2.0"
 homepage = "https://github.com/longbridge/gpui-component"
 repository = "https://github.com/longbridge/gpui-component"
+description = "Wef is a Rust library for embedding WebView functionality using Chromium Embedded Framework (CEF3) with offscreen rendering support."
 
 [build-dependencies]
 cc = { version = "1.2.18", features = ["parallel"] }
