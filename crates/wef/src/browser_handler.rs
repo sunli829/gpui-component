@@ -178,8 +178,8 @@ pub trait BrowserHandler {
 
     /// Called to report find results returned by [`crate::Browser::find`].
     ///
-    /// `identifer`` is a unique incremental identifier for the currently active
-    /// search.
+    /// `identifier`` is a unique incremental identifier for the currently
+    /// active search.
     /// `count`` is the number of matches currently identified.
     /// `selection_rect` is the location of where the match was found (in window
     /// coordinates).
@@ -187,7 +187,7 @@ pub trait BrowserHandler {
     /// `final_update` is `true` if this is the last find notification.
     fn on_find_result(
         &mut self,
-        identifer: i32,
+        identifier: i32,
         count: i32,
         selection_rect: Rect<LogicalUnit<i32>>,
         active_match_ordinal: i32,
@@ -580,7 +580,7 @@ pub(crate) extern "C" fn on_context_menu<T: BrowserHandler>(
 
 pub(crate) extern "C" fn on_find_result<T: BrowserHandler>(
     userdata: *mut c_void,
-    identifer: i32,
+    identifier: i32,
     count: i32,
     selection_rect: *const Rect<i32>,
     active_match_ordinal: i32,
@@ -589,7 +589,7 @@ pub(crate) extern "C" fn on_find_result<T: BrowserHandler>(
     unsafe {
         let state = &mut *(userdata as *mut BrowserState<T>);
         state.handler.on_find_result(
-            identifer,
+            identifier,
             count,
             (*selection_rect).map(LogicalUnit),
             active_match_ordinal,
