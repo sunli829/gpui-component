@@ -2,11 +2,11 @@
 
 use wef::{Frame, LogSeverity};
 
-/// Emited when the browser is created.
+/// Emitted when the browser is created.
 #[derive(Debug)]
 pub struct CreatedEvent;
 
-/// Emited when the address of the frame changes.
+/// Emitted when the address of the frame changes.
 #[derive(Debug)]
 pub struct AddressChangedEvent {
     /// The frame object.
@@ -15,28 +15,28 @@ pub struct AddressChangedEvent {
     pub url: String,
 }
 
-/// Emited when the title changes.
+/// Emitted when the title changes.
 #[derive(Debug)]
 pub struct TitleChangedEvent {
     /// The new title.
     pub title: String,
 }
 
-/// Emited when the browser is about to display a tooltip.
+/// Emitted when the browser is about to display a tooltip.
 #[derive(Debug)]
 pub struct TooltipEvent {
     /// The tooltip text.
     pub text: String,
 }
 
-/// Emited when the browser receives a status message.
+/// Emitted when the browser receives a status message.
 #[derive(Debug)]
 pub struct StatusMessageEvent {
     /// The status message text.
     pub text: String,
 }
 
-/// Emited when the browser receives a console message.
+/// Emitted when the browser receives a console message.
 #[derive(Debug)]
 pub struct ConsoleMessageEvent {
     /// The console message text.
@@ -49,21 +49,21 @@ pub struct ConsoleMessageEvent {
     pub line_number: i32,
 }
 
-/// Emited when preparing to open a popup browser window.
+/// Emitted when preparing to open a popup browser window.
 #[derive(Debug)]
 pub struct BeforePopupEvent {
     /// The URL of the popup window.
     pub url: String,
 }
 
-/// Emited when the overall page loading progress changes.
+/// Emitted when the overall page loading progress changes.
 #[derive(Debug)]
 pub struct LoadingProgressChangedEvent {
     /// Ranges from 0.0 to 1.0.
     pub progress: f32,
 }
 
-/// Emited when the loading state changes.
+/// Emitted when the loading state changes.
 #[derive(Debug)]
 pub struct LoadingStateChangedEvent {
     /// Whether the browser is loading a page.
@@ -74,21 +74,21 @@ pub struct LoadingStateChangedEvent {
     pub can_go_forward: bool,
 }
 
-/// Emited when the browser starts loading a page.
+/// Emitted when the browser starts loading a page.
 #[derive(Debug)]
 pub struct LoadStartEvent {
     /// The frame object.
     pub frame: Frame,
 }
 
-/// Emited when the browser finishes loading a page.
+/// Emitted when the browser finishes loading a page.
 #[derive(Debug)]
 pub struct LoadEndEvent {
     /// The frame object.
     pub frame: Frame,
 }
 
-/// Emited when the browser fails to load a page.
+/// Emitted when the browser fails to load a page.
 #[derive(Debug)]
 pub struct LoadErrorEvent {
     /// The frame object.

@@ -11,7 +11,7 @@ pub(crate) type wef_file_dialog_callback_t = c_void;
 pub(crate) type wef_js_dialog_callback_t = c_void;
 pub(crate) type wef_query_callback_t = c_void;
 
-type DestoryFn = extern "C" fn(*mut c_void);
+type DestroyFn = extern "C" fn(*mut c_void);
 
 #[repr(C)]
 pub(crate) struct CSettings {
@@ -32,7 +32,7 @@ pub(crate) struct CBrowserSettings {
     pub(crate) inject_javascript: *const c_char,
     pub(crate) callbacks: CBrowserCallbacks,
     pub(crate) userdata: *mut c_void,
-    pub(crate) destroy_userdata: DestoryFn,
+    pub(crate) destroy_userdata: DestroyFn,
 }
 
 #[repr(C)]
@@ -56,7 +56,7 @@ pub(crate) struct CContextMenuParams {
 
 #[repr(C)]
 pub(crate) struct CBrowserCallbacks {
-    pub(crate) on_created: DestoryFn,
+    pub(crate) on_created: DestroyFn,
     pub(crate) on_popup_show: extern "C" fn(*mut c_void, bool),
     pub(crate) on_popup_position: extern "C" fn(*mut c_void, *const Rect<i32>),
     pub(crate) on_paint: extern "C" fn(*mut c_void, i32, *const c_void, *const c_void, u32, u32),
