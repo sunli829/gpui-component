@@ -176,9 +176,6 @@ pub(crate) fn download_cef(version: &str, platform: CefBuildsPlatform, path: &Pa
 
     let root_dir_name = platform.root_dir_name(version).unwrap();
 
-    println!(
-        "Set the environment variable CEF_ROOT to: {}",
-        root_dir_name
-    );
+    println!("Set the environment variable CEF_ROOT = {}", root_dir_name);
     Ok(())
 }
