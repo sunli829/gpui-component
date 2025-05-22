@@ -57,7 +57,7 @@ jobs:
         run: |
           mkdir -p $HOME/.local/share
           cargo run -p wef-tool download-cef ~/.local/share
-          echo "CEF_ROOT=$HOME/.local/share/cef_binary_${{ env.CEF_VERSION }}_${{ matrix.cef_arch }}" >> $GITHUB_ENV
+          echo CEF_ROOT=$HOME/.local/share/cef_binary_${{ env.CEF_VERSION }}_${{ matrix.cef_arch }} >> $GITHUB_ENV
       - name: Typo check
         if: ${{ matrix.run_on == 'macos-latest' }}
         run: |
