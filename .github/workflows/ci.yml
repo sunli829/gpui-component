@@ -80,7 +80,12 @@ jobs:
         run: |
           export LD_LIBRARY_PATH=${{ env.CEF_ROOT }}/Debug:$LD_LIBRARY_PATH
           cargo test --all
-      - name: Test
-        if: ${{ matrix.run_on != 'ubuntu-latest' }}
+      - name: Test Windows
+        if: ${{ matrix.run_on == 'windows-latest' }}
+        run: |
+          $env:Path = "${{ env.CEF_ROOT }}/Debug;" + $env:Path
+          cargo test --all
+      - name: Test MacOS
+        if: ${{ matrix.run_on == 'macos-latest' }}
         run: |
           cargo test --all
