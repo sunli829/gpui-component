@@ -39,7 +39,22 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/
+            ~/.cef
           key: test-cargo-${{ matrix.target }}-${{ hashFiles('**/Cargo.lock') }}
+      - name: Setup CEF Version
+        run: echo "CEF_VERSION=136.1.6+g1ac1b14+chromium-136.0.7103.114" >> $GITHUB_ENV
+      - name: Cache CEF
+        id: cache-cef
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/cef
+          key: cef-$CEF_VERSION
+      - name: Download CEF
+        if: ${{ !steps.cache-cef.outputs.cache-hit }}
+        run: |
+          mkdir -p $HOME/.local/share
+          cargo run -p wef-tool download-cef ~/.local/share
+          echo "CEF_ROOT=$HOME/.local/share/cef_binary_136.1.6+g1ac1b14+chromium-136.0.7103.114_linux64" >> $GITHUB_ENV
       - name: Typo check
         if: ${{ matrix.run_on == 'macos-latest' }}
         run: |
