@@ -65,6 +65,7 @@ jobs:
         if: ${{ matrix.run_on == 'windows-latest' }}
         run: |
           echo CEF_ROOT=$HOME\.local\share\cef_binary_${{ env.CEF_VERSION }}_${{ matrix.cef_arch }} >> $env:GITHUB_ENV
+          dir C:\\Users\\runneradmin\\.local\\share\\cef_binary_136.1.6+g1ac1b14+chromium-136.0.7103.114_windows64\\libcef_dll\\wrapper
       - name: Typo check
         if: ${{ matrix.run_on == 'macos-latest' }}
         run: |
@@ -74,12 +75,12 @@ jobs:
         if: ${{ matrix.run_on == 'macos-latest' }}
         run: |
           cargo clippy -- --deny warnings
-      - name: Test
+      - name: Test Linux
         if: ${{ matrix.run_on == 'ubuntu-latest' }}
         run: |
           export LD_LIBRARY_PATH=${{ env.CEF_ROOT }}/Debug:$LD_LIBRARY_PATH
           cargo test --all
-      - name: Test Linux
+      - name: Test
         if: ${{ matrix.run_on != 'ubuntu-latest' }}
         run: |
           cargo test --all
