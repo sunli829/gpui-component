@@ -84,7 +84,7 @@ int GetTimeIntervalMilliseconds(const CefTime& from) {
 }
 
 struct WorkSource : public GSource {
-  MainMessageLoopExternalPumpLinux* pump;
+  ExternalPumpLinux* pump;
 };
 
 gboolean WorkSourcePrepare(GSource* source, gint* timeout_ms) {
@@ -141,7 +141,7 @@ ExternalPumpLinux::~ExternalPumpLinux() {
   close(wakeup_pipe_write_);
 }
 
-void ExternalPumpLinux::ExternalPumpLinux(int64_t delay_ms) {
+void ExternalPumpLinux::OnScheduleMessagePumpWork(int64_t delay_ms) {
   // This can be called on any thread, so we don't want to touch any state
   // variables as we would then need locks all over. This ensures that if we
   // are sleeping in a poll that we will wake up.
