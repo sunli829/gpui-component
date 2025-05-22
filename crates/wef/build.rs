@@ -266,7 +266,16 @@ fn build_wef_sys(cef_root: &Path) {
         sources.extend(["cpp/external_pump_linux.cpp"]);
     }
 
-    Build::new()
+    let mut build = Build::new();
+
+    // #[cfg(target_os = "linux")]
+    {
+        let glib = pkg_config::probe_library("glib-2.0")
+            .unwrap_or_else(|err| panic!("failed to find glib-2.0: {}", err));
+        build.includes(glib.include_paths);
+    }
+
+    build
         .cpp(true)
         .std("c++17")
         .cargo_warnings(false)
