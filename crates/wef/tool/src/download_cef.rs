@@ -174,14 +174,11 @@ pub(crate) fn download_cef(version: &str, platform: CefBuildsPlatform, path: &Pa
     println!("{}", "Successfully downloaded and extracted CEF!".green());
     println!();
 
-    println!("Set the CEF_ROOT environment variable:");
-
     let root_dir_name = platform.root_dir_name(version).unwrap();
 
-    #[cfg(target_os = "windows")]
-    println!("set CEF_ROOT = {}", path.join(root_dir_name).display());
-    #[cfg(not(target_os = "windows"))]
-    println!("export CEF_ROOT = {}", path.join(root_dir_name).display());
-
+    println!(
+        "Set the environment variable CEF_ROOT to: {}",
+        root_dir_name
+    );
     Ok(())
 }
