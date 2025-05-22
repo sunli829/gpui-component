@@ -56,7 +56,7 @@ jobs:
         if: ${{ !steps.cache-cef.outputs.cache-hit }}
         run: |
           mkdir -p $HOME/.local/share
-          cargo run -p wef-tool download-cef ~/.local/share
+          cargo run -p wef-tool download-cef $HOME/.local/share
       - name: Set CEF_ROOT
         if: ${{ matrix.run_on != 'windows-latest' }}
         run: |
@@ -65,7 +65,7 @@ jobs:
         if: ${{ matrix.run_on == 'windows-latest' }}
         run: |
           echo CEF_ROOT=$HOME\.local\share\cef_binary_${{ env.CEF_VERSION }}_${{ matrix.cef_arch }} >> $env:GITHUB_ENV
-          dir C:\\Users\\runneradmin\\.local\\share\\cef_binary_136.1.6+g1ac1b14+chromium-136.0.7103.114_windows64\\libcef_dll\\wrapper
+          dir $HOME/.local/share
       - name: Typo check
         if: ${{ matrix.run_on == 'macos-latest' }}
         run: |
