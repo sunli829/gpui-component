@@ -74,6 +74,12 @@ jobs:
         if: ${{ matrix.run_on == 'macos-latest' }}
         run: |
           cargo clippy -- --deny warnings
-      - name: Build test
+      - name: Test
+        if: ${{ matrix.run_on == 'ubuntu-latest' }}
+        run: |
+          export LD_LIBRARY_PATH=$CEF_ROOT:$LD_LIBRARY_PATH
+          cargo test --all
+      - name: Test Linux
+        if: ${{ matrix.run_on != 'ubuntu-latest' }}
         run: |
           cargo test --all
