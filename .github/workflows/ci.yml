@@ -64,7 +64,7 @@ jobs:
       - name: Set CEF_ROOT on windows
         if: ${{ matrix.run_on == 'windows-latest' }}
         run: |
-          echo CEF_ROOT=$HOME/.local/share/cef_binary_${{ env.CEF_VERSION }}_${{ matrix.cef_arch }} >> $env:GITHUB_ENV
+          echo CEF_ROOT=$HOME\.local\share\cef_binary_${{ env.CEF_VERSION }}_${{ matrix.cef_arch }} >> $env:GITHUB_ENV
       - name: Typo check
         if: ${{ matrix.run_on == 'macos-latest' }}
         run: |

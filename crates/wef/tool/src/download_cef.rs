@@ -150,8 +150,8 @@ pub(crate) fn download_cef(version: &str, platform: CefBuildsPlatform, path: &Pa
             err
         ));
     })?;
-    let target_path = tmpdir_path.path().join("cef.tar.bz2");
-    download_file(&url, &pb, &target_path)?;
+    let archive_path = tmpdir_path.path().join("cef.tar.bz2");
+    download_file(&url, &pb, &archive_path)?;
 
     pb.finish_with_message("Download completed");
 
@@ -168,7 +168,7 @@ pub(crate) fn download_cef(version: &str, platform: CefBuildsPlatform, path: &Pa
 
     // Extract with progress
     let pb = create_extract_progress_bar();
-    extract_archive(&target_path, path, &pb)?;
+    extract_archive(&archive_path, path, &pb)?;
     pb.finish_with_message("Extraction completed");
 
     println!("{}", "Successfully downloaded and extracted CEF!".green());
