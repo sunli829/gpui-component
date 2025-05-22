@@ -6,6 +6,8 @@ on:
       - "*"
     tags:
       - "*"
+env:
+  CEF_VERSION: "136.1.6+g1ac1b14+chromium-136.0.7103.114"
 
 jobs:
   test:
@@ -25,8 +27,6 @@ jobs:
             run_on: windows-latest
             cef_arch: windows64
     runs-on: ${{ matrix.run_on }}
-    environment:
-      CEF_VERSION: "136.1.6+g1ac1b14+chromium-136.0.7103.114"
     steps:
       - uses: actions/checkout@v4
       - name: Install system dependencies
@@ -57,7 +57,7 @@ jobs:
         run: |
           mkdir -p $HOME/.local/share
           cargo run -p wef-tool download-cef ~/.local/share
-          echo "CEF_ROOT=$HOME/.local/share/cef_binary_136.1.6+${{ env.CEF_VERSION }}+${{ matrix.cef_arch }}" >> $GITHUB_ENV
+          echo "CEF_ROOT=$HOME/.local/share/cef_binary_${{ env.CEF_VERSION }}_${{ matrix.cef_arch }}" >> $GITHUB_ENV
       - name: Typo check
         if: ${{ matrix.run_on == 'macos-latest' }}
         run: |
