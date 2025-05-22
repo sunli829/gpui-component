@@ -51,7 +51,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.local/share/cef
-          key: cef-$CEF_VERSION
+          key: cef-$CEF_VERSION-${{ matrix.cef_arch }}
       - name: Download CEF
         if: ${{ !steps.cache-cef.outputs.cache-hit }}
         run: |
