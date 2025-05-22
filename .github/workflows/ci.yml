@@ -50,14 +50,21 @@ jobs:
         id: cache-cef
         uses: actions/cache@v4
         with:
-          path: ~/.local/share/cef
+          path: ~/.local/share/cef_binary_${{ env.CEF_VERSION }}_${{ matrix.cef_arch }}
           key: cef-${{ env.CEF_VERSION }}-${{ matrix.cef_arch }}
       - name: Download CEF
         if: ${{ !steps.cache-cef.outputs.cache-hit }}
         run: |
           mkdir -p $HOME/.local/share
           cargo run -p wef-tool download-cef ~/.local/share
+      - name: Set CEF_ROOT
+        if: ${{ matrix.run_on != 'windows-latest' }}
+        run: |
           echo CEF_ROOT=$HOME/.local/share/cef_binary_${{ env.CEF_VERSION }}_${{ matrix.cef_arch }} >> $GITHUB_ENV
+      - name: Set CEF_ROOT on windows
+        if: ${{ matrix.run_on == 'windows-latest' }}
+        run: |
+          echo CEF_ROOT=$HOME/.local/share/cef_binary_${{ env.CEF_VERSION }}_${{ matrix.cef_arch }} >> $env:GITHUB_ENV
       - name: Typo check
         if: ${{ matrix.run_on == 'macos-latest' }}
         run: |
