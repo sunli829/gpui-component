@@ -1,13 +1,27 @@
 mod add_cef_framework;
 mod add_helper;
+mod cef_platform;
+mod download_cef;
 mod utils;
 
 use std::path::PathBuf;
 
 use clap::{Parser, Subcommand};
 
+use crate::cef_platform::{CefBuildsPlatform, DEFAULT_CEF_VERSION};
+
 #[derive(Subcommand)]
 enum Commands {
+    DownloadCef {
+        /// CEF version
+        #[clap(long, default_value = DEFAULT_CEF_VERSION)]
+        version: String,
+        /// Platform
+        #[clap(long, default_value = "auto")]
+        platform: CefBuildsPlatform,
+        /// Target path
+        path: PathBuf,
+    },
     /// Add helper processes to the app
     AddHelper {
         /// Target app path
@@ -53,6 +67,13 @@ fn main() {
     let cli = Cli::parse();
 
     match cli.command {
+        Commands::DownloadCef {
+            version,
+            platform,
+            path,
+        } => {
+            _ = download_cef::download_cef(&version, platform, &path);
+        }
         Commands::AddHelper {
             app_path,
             cef_root,
