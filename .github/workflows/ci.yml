@@ -25,6 +25,8 @@ jobs:
             run_on: windows-latest
             cef_arch: windows64
     runs-on: ${{ matrix.run_on }}
+    environment:
+      CEF_VERSION: "136.1.6+g1ac1b14+chromium-136.0.7103.114"
     steps:
       - uses: actions/checkout@v4
       - name: Install system dependencies
@@ -44,20 +46,18 @@ jobs:
             target/
             ~/.cef
           key: test-cargo-${{ matrix.target }}-${{ hashFiles('**/Cargo.lock') }}
-      - name: Setup CEF Version
-        run: echo "CEF_VERSION=136.1.6+g1ac1b14+chromium-136.0.7103.114" >> $GITHUB_ENV
       - name: Cache CEF
         id: cache-cef
         uses: actions/cache@v4
         with:
           path: ~/.local/share/cef
-          key: cef-$CEF_VERSION-${{ matrix.cef_arch }}
+          key: cef-${{ env.CEF_VERSION }}-${{ matrix.cef_arch }}
       - name: Download CEF
         if: ${{ !steps.cache-cef.outputs.cache-hit }}
         run: |
           mkdir -p $HOME/.local/share
           cargo run -p wef-tool download-cef ~/.local/share
-          echo "CEF_ROOT=$HOME/.local/share/cef_binary_136.1.6+g1ac1b14+chromium-136.0.7103.114_${{ matrix.cef_arch }}" >> $GITHUB_ENV
+          echo "CEF_ROOT=$HOME/.local/share/cef_binary_136.1.6+${{ env.CEF_VERSION }}+${{ matrix.cef_arch }}" >> $GITHUB_ENV
       - name: Typo check
         if: ${{ matrix.run_on == 'macos-latest' }}
         run: |
