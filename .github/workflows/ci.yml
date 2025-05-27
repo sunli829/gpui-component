@@ -78,12 +78,12 @@ jobs:
       - name: Test Linux
         if: ${{ matrix.run_on == 'ubuntu-latest' }}
         run: |
-          export LD_LIBRARY_PATH=${{ env.CEF_ROOT }}/Debug:$LD_LIBRARY_PATH
+          cargo run -p wef-tool add-framework target/debug
           cargo test --all
       - name: Test Windows
         if: ${{ matrix.run_on == 'windows-latest' }}
         run: |
-          $env:Path = "${{ env.CEF_ROOT }}/Debug;" + $env:Path
+          cargo run -p wef-tool add-framework target/debug
           cargo test --all
       - name: Test MacOS
         if: ${{ matrix.run_on == 'macos-latest' }}
