@@ -1,10 +1,10 @@
-use std::{rc::Rc, sync::Arc};
+use std::{panic::Location, rc::Rc, sync::Arc};
 
 use gpui::{
     App, Bounds, BoxShadow, Corners, DispatchPhase, Element, ElementInputHandler, Entity,
-    FocusHandle, GlobalElementId, Hitbox, InteractiveElement, Interactivity, IntoElement, LayoutId,
-    MouseDownEvent, MouseMoveEvent, MouseUpEvent, Pixels, RenderImage, Size, StyleRefinement,
-    Styled, Window, hsla, point, px, size,
+    FocusHandle, GlobalElementId, Hitbox, InspectorElementId, InteractiveElement, Interactivity,
+    IntoElement, LayoutId, MouseDownEvent, MouseMoveEvent, MouseUpEvent, Pixels, RenderImage, Size,
+    StyleRefinement, Styled, Window, hsla, point, px, size,
 };
 use wef::{Browser, LogicalUnit, Rect};
 
@@ -67,23 +67,31 @@ impl Element for WebViewElement {
         self.interactivity.element_id.clone()
     }
 
+    fn source_location(&self) -> Option<&'static Location<'static>> {
+        None
+    }
+
     fn request_layout(
         &mut self,
         global_id: Option<&GlobalElementId>,
+        inspector_id: Option<&InspectorElementId>,
         window: &mut Window,
         cx: &mut App,
     ) -> (LayoutId, Self::RequestLayoutState) {
-        let layout_id =
-            self.interactivity
-                .request_layout(global_id, window, cx, |style, window, cx| {
-                    window.request_layout(style, None, cx)
-                });
+        let layout_id = self.interactivity.request_layout(
+            global_id,
+            inspector_id,
+            window,
+            cx,
+            |style, window, cx| window.request_layout(style, None, cx),
+        );
         (layout_id, ())
     }
 
     fn prepaint(
         &mut self,
         global_id: Option<&GlobalElementId>,
+        inspector_id: Option<&InspectorElementId>,
         bounds: Bounds<Pixels>,
         _request_layout: &mut Self::RequestLayoutState,
         window: &mut Window,
@@ -95,6 +103,7 @@ impl Element for WebViewElement {
 
         self.interactivity.prepaint(
             global_id,
+            inspector_id,
             bounds,
             bounds.size,
             window,
@@ -106,6 +115,7 @@ impl Element for WebViewElement {
     fn paint(
         &mut self,
         global_id: Option<&GlobalElementId>,
+        inspector_id: Option<&InspectorElementId>,
         bounds: Bounds<Pixels>,
         _request_layout: &mut Self::RequestLayoutState,
         hitbox: &mut Self::PrepaintState,
@@ -120,6 +130,7 @@ impl Element for WebViewElement {
 
         self.interactivity.paint(
             global_id,
+            inspector_id,
             bounds,
             hitbox.as_ref(),
             window,
