@@ -84,13 +84,10 @@
 4. Copy the required CEF files to the target directory:
 
     ```bash
-    cp $CEF_ROOT/Debug/*.so target/debug/
-    cp $CEF_ROOT/Debug/vk_swiftshader_icd.json target/debug/
-    cp $CEF_ROOT/Debug/v8_context_snapshot.bin target/debug/
-    cp -r $CEF_ROOT/Resources/* target/debug/
+    wef-tool add-framework target/debug
     ```
 
-    > If you expect release build, you can use `cargo build --release` and copy the files from the `Release` directory instead of `Debug`.
+    > If you expect release build, you can use `cargo build --release` and copy the files with `wef-tool add-framework --release target/release` instead.
 
 5. Run the example
 
@@ -118,13 +115,10 @@
 4. Copy the required CEF files to the target directory:
 
     ```bash
-    cp $CEF_ROOT/Debug/*.dll target/debug/
-    cp $CEF_ROOT/Debug/vk_swiftshader_icd.json target/debug/
-    cp $CEF_ROOT/Debug/v8_context_snapshot.bin target/debug/
-    cp -r $CEF_ROOT/Resources/* target/debug/
+    wef-tool add-framework target/debug
     ```
 
-    > If you expect release build, you can use `cargo build --release` and copy the files from the `Release` directory instead of `Debug`.
+    > If you expect release build, you can use `cargo build --release` and copy the files with `wef-tool add-framework --release target/release` instead.
 
 5. Run the example
 
