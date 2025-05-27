@@ -345,6 +345,15 @@ pub(crate) fn add_helper(settings: &AddHelperSettings) -> Result<()> {
     );
 
     let info_path = settings.app_path.join("Contents").join("Info.plist");
+
+    if !info_path.exists() {
+        print_error(format_args!(
+            "{} is not a valid Macos app.",
+            settings.app_path.display(),
+        ));
+        anyhow::bail!("Info.plist not found");
+    }
+
     let bundle_info = read_bundle_info(&info_path).inspect_err(|err| {
         print_error(format_args!(
             "failed to read {}: {}",

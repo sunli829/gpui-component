@@ -23,7 +23,7 @@ enum Commands {
         #[clap(long, default_value = "auto")]
         platform: CefBuildsPlatform,
         /// Force download even if the file already exists
-        #[clap(long, default_value_t = false)]
+        #[clap(long, short, default_value_t = false)]
         force: bool,
     },
     /// Add helper processes to the app
@@ -46,7 +46,7 @@ enum Commands {
         #[clap(long, short)]
         release: bool,
         /// Force adding the helper processes even if they already exist
-        #[clap(long, default_value_t = false)]
+        #[clap(long, short, default_value_t = false)]
         force: bool,
     },
     /// Add CEF framework to the app
@@ -60,7 +60,7 @@ enum Commands {
         #[clap(long, short)]
         release: bool,
         /// Force adding the framework even if it already exists
-        #[clap(long, default_value_t = false)]
+        #[clap(long, short, default_value_t = false)]
         force: bool,
     },
 }
