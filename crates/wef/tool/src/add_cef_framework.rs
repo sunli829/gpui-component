@@ -10,6 +10,7 @@ pub(crate) struct AddCefFrameworkSettings {
     pub(crate) cef_root: Option<PathBuf>,
     pub(crate) app_path: PathBuf,
     pub(crate) release: bool,
+    pub(crate) force: bool,
 }
 
 pub(crate) fn add_cef_framework(settings: &AddCefFrameworkSettings) -> Result<()> {
@@ -39,6 +40,19 @@ pub(crate) fn add_cef_framework(settings: &AddCefFrameworkSettings) -> Result<()
             "Release"
         })
         .join("Chromium Embedded Framework.framework");
+
+    if !settings.force
+        && frameworks_path
+            .join("Chromium Embedded Framework.framework")
+            .exists()
+    {
+        println!(
+            "CEF framework already exists at {}. Use {} to overwrite.",
+            "--force".bright_white(),
+            frameworks_path.display()
+        );
+        return Ok(());
+    }
 
     fs_extra::dir::copy(
         &cef_framework_path,

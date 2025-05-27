@@ -19,6 +19,7 @@ pub(crate) struct AddHelperSettings {
     pub(crate) wef_version: Option<String>,
     pub(crate) wef_path: Option<PathBuf>,
     pub(crate) release: bool,
+    pub(crate) force: bool,
 }
 
 /// ```askama
@@ -351,6 +352,27 @@ pub(crate) fn add_helper(settings: &AddHelperSettings) -> Result<()> {
             err
         ));
     })?;
+
+    if !settings.force
+        && HelperKind::ALL.iter().all(|kind| {
+            settings
+                .app_path
+                .join("Contents")
+                .join("Frameworks")
+                .join(format!(
+                    "{}.app",
+                    kind.bundle_name(&kind.bundle_name(&bundle_info.bundle_name))
+                ))
+                .exists()
+        })
+    {
+        println!(
+            "Helper apps already exist in {}. Use {} to overwrite.",
+            "--force".bright_white(),
+            settings.app_path.display()
+        );
+        return Ok(());
+    }
 
     println!("Bundle name: {}", bundle_info.bundle_name);
     println!("Bundle identifier: {}", bundle_info.bundle_identifier);

@@ -1,7 +1,7 @@
 use std::{
     fs::{self, File},
     io::{Read, Write},
-    path::Path,
+    path::{Path, PathBuf},
 };
 
 use anyhow::Result;
@@ -11,6 +11,14 @@ use reqwest::blocking::Client;
 use tar::EntryType;
 
 use crate::{cef_platform::CefBuildsPlatform, utils::print_error};
+
+#[derive(Debug)]
+pub(crate) struct DownloadCefSettings {
+    pub(crate) path: PathBuf,
+    pub(crate) version: String,
+    pub(crate) platform: CefBuildsPlatform,
+    pub(crate) force: bool,
+}
 
 fn create_download_progress_bar() -> ProgressBar {
     let pb = ProgressBar::new(0);
@@ -126,10 +134,19 @@ fn extract_archive(archive_path: &Path, target_dir: &Path, pb: &ProgressBar) -> 
     Ok(())
 }
 
-pub(crate) fn download_cef(version: &str, platform: CefBuildsPlatform, path: &Path) -> Result<()> {
-    let url = platform
-        .download_url(version)
-        .ok_or_else(|| anyhow::anyhow!("unsupported platform: {:?}", platform))?;
+pub(crate) fn download_cef(settings: &DownloadCefSettings) -> Result<()> {
+    if !settings.force && settings.path.exists() {
+        println!(
+            "CEF already exists at {}. Use {} to re-download.",
+            "--force".bright_white(),
+            settings.path.display()
+        );
+    }
+
+    let url = settings
+        .platform
+        .download_url(&settings.version)
+        .ok_or_else(|| anyhow::anyhow!("unsupported platform: {:?}", settings.platform))?;
 
     println!("Downloading CEF from {}...", url);
 
@@ -155,26 +172,26 @@ pub(crate) fn download_cef(version: &str, platform: CefBuildsPlatform, path: &Pa
 
     pb.finish_with_message("Download completed");
 
-    println!("Extracting CEF to {}...", path.display());
+    println!("Extracting CEF to {}...", settings.path.display());
 
     // Create the target directory if it doesn't exist
-    fs::create_dir_all(path).inspect_err(|err| {
+    fs::create_dir_all(&settings.path).inspect_err(|err| {
         print_error(format_args!(
             "failed to create directory {}: {}",
-            path.display(),
+            settings.path.display(),
             err
         ));
     })?;
 
     // Extract with progress
     let pb = create_extract_progress_bar();
-    extract_archive(&archive_path, path, &pb)?;
+    extract_archive(&archive_path, &settings.path, &pb)?;
     pb.finish_with_message("Extraction completed");
 
     println!("{}", "Successfully downloaded and extracted CEF!".green());
     println!();
 
-    let root_dir_name = platform.root_dir_name(version).unwrap();
+    let root_dir_name = settings.platform.root_dir_name(&settings.version).unwrap();
 
     println!("Set the environment variable CEF_ROOT = {}", root_dir_name);
     Ok(())

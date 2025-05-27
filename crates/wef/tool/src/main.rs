@@ -12,15 +12,19 @@ use crate::cef_platform::{CefBuildsPlatform, DEFAULT_CEF_VERSION};
 
 #[derive(Subcommand)]
 enum Commands {
+    /// Download CEF framework
     DownloadCef {
+        /// Target path
+        path: PathBuf,
         /// CEF version
         #[clap(long, default_value = DEFAULT_CEF_VERSION)]
         version: String,
         /// Platform
         #[clap(long, default_value = "auto")]
         platform: CefBuildsPlatform,
-        /// Target path
-        path: PathBuf,
+        /// Force download even if the file already exists
+        #[clap(long, default_value_t = false)]
+        force: bool,
     },
     /// Add helper processes to the app
     AddHelper {
@@ -41,6 +45,9 @@ enum Commands {
         /// Build artifacts in release mode, with optimizations
         #[clap(long, short)]
         release: bool,
+        /// Force adding the helper processes even if they already exist
+        #[clap(long, default_value_t = false)]
+        force: bool,
     },
     /// Add CEF framework to the app
     AddFramework {
@@ -52,6 +59,9 @@ enum Commands {
         /// Build artifacts in release mode, with optimizations
         #[clap(long, short)]
         release: bool,
+        /// Force adding the framework even if it already exists
+        #[clap(long, default_value_t = false)]
+        force: bool,
     },
 }
 
@@ -68,11 +78,18 @@ fn main() {
 
     match cli.command {
         Commands::DownloadCef {
+            path,
             version,
             platform,
-            path,
+            force,
         } => {
-            _ = download_cef::download_cef(&version, platform, &path);
+            let settings = download_cef::DownloadCefSettings {
+                path,
+                version,
+                platform,
+                force,
+            };
+            _ = download_cef::download_cef(&settings);
         }
         Commands::AddHelper {
             app_path,
@@ -80,6 +97,7 @@ fn main() {
             wef_version,
             wef_path,
             release,
+            force,
         } => {
             let settings = add_helper::AddHelperSettings {
                 cef_root,
@@ -87,6 +105,7 @@ fn main() {
                 wef_version,
                 wef_path,
                 release,
+                force,
             };
             _ = add_helper::add_helper(&settings);
         }
@@ -94,11 +113,13 @@ fn main() {
             app_path,
             cef_root,
             release,
+            force,
         } => {
             let settings = add_cef_framework::AddCefFrameworkSettings {
                 cef_root,
                 app_path,
                 release,
+                force,
             };
             _ = add_cef_framework::add_cef_framework(&settings);
         }
