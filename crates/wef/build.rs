@@ -27,6 +27,10 @@ fn main() {
     {
         println!("cargo:rustc-link-lib=cef");
     }
+    #[cfg(target_os = "macos")]
+    {
+        println!("cargo:rustc-link-lib=framework=Foundation");
+    }
 
     build_dll_wrapper(&cef_root);
     build_wef_sys(&cef_root);

@@ -172,14 +172,22 @@ where
 
     // create Cargo.toml
     let cargo_toml_path = proj_dir.path().join("Cargo.toml");
+    let mut cargo_toml_file = File::create(&cargo_toml_path).inspect_err(|err| {
+        print_error(format_args!(
+            "failed to create {}: {}",
+            cargo_toml_path.display(),
+            err
+        ));
+    })?;
+
     TemplateCargoToml {
         wef_version,
         wef_path,
     }
-    .write_into(&mut File::create(&cargo_toml_path)?)
+    .write_into(&mut cargo_toml_file)
     .inspect_err(|err| {
         print_error(format_args!(
-            "failed to create {}: {}",
+            "failed to write {}: {}",
             cargo_toml_path.display(),
             err
         ));
@@ -364,15 +372,15 @@ pub(crate) fn add_helper(settings: &AddHelperSettings) -> Result<()> {
 
     if !settings.force
         && HelperKind::ALL.iter().all(|kind| {
-            settings
+            let helper_path = settings
                 .app_path
                 .join("Contents")
                 .join("Frameworks")
                 .join(format!(
                     "{}.app",
-                    kind.bundle_name(&kind.bundle_name(&bundle_info.bundle_name))
-                ))
-                .exists()
+                    kind.bundle_name(&bundle_info.bundle_name)
+                ));
+            helper_path.exists()
         })
     {
         println!(
