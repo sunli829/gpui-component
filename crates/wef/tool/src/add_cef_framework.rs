@@ -22,8 +22,8 @@ pub(crate) fn add_cef_framework(settings: &AddCefFrameworkSettings) -> Result<()
         settings.app_path.display()
     );
 
-    let frameworks_path = settings.app_path.join("Contents").join("Frameworks");
-    if !frameworks_path.exists() {
+    let contents_path = settings.app_path.join("Contents");
+    if !contents_path.exists() {
         print_error(format_args!(
             "{} is not a valid Macos app.",
             settings.app_path.display(),
@@ -32,6 +32,7 @@ pub(crate) fn add_cef_framework(settings: &AddCefFrameworkSettings) -> Result<()
     }
 
     // create frameworks directory
+    let frameworks_path = contents_path.join("Frameworks");
     std::fs::create_dir_all(&frameworks_path).inspect_err(|err| {
         print_error(format_args!(
             "failed to create directory {}: {}",
