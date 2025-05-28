@@ -44,6 +44,9 @@ fn create_extract_progress_bar() -> ProgressBar {
 
 fn download_file(url: &str, pb: &ProgressBar, path: &Path) -> Result<()> {
     let client = Client::new();
+
+    println!("Downloading CEF from {}...", url);
+
     let mut response = client.get(url).send().inspect_err(|err| {
         print_error(format_args!("failed to download CEF: {}", err));
     })?;

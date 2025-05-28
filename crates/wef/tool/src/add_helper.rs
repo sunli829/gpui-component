@@ -8,7 +8,6 @@ use anyhow::Result;
 use askama::Template;
 use colored::Colorize;
 use serde::Deserialize;
-use tempfile::tempdir;
 
 use crate::utils::{find_cef_root, print_error};
 
@@ -153,7 +152,17 @@ where
 {
     println!("Building the helper binary...");
 
-    let proj_dir = tempdir()?;
+    let proj_dir = dirs::home_dir()
+        .expect("home directory not found")
+        .join(".wef-tool")
+        .join("helper");
+    std::fs::create_dir_all(proj_dir.as_path()).inspect_err(|err| {
+        print_error(format_args!(
+            "failed to create directory {}: {}",
+            proj_dir.display(),
+            err
+        ));
+    })?;
 
     // query wef version
     let (wef_version, wef_path) = if let Some(wef_path) = &settings.wef_path {
@@ -171,7 +180,7 @@ where
     };
 
     // create Cargo.toml
-    let cargo_toml_path = proj_dir.path().join("Cargo.toml");
+    let cargo_toml_path = proj_dir.join("Cargo.toml");
     let mut cargo_toml_file = File::create(&cargo_toml_path).inspect_err(|err| {
         print_error(format_args!(
             "failed to create {}: {}",
@@ -194,7 +203,7 @@ where
     })?;
 
     // create src/main.rs
-    let src_path = proj_dir.path().join("src");
+    let src_path = proj_dir.join("src");
     std::fs::create_dir_all(&src_path).inspect_err(|err| {
         print_error(format_args!(
             "failed to create directory {}: {}",
@@ -203,7 +212,7 @@ where
         ));
     })?;
 
-    let main_rs_path = proj_dir.path().join("src").join("main.rs");
+    let main_rs_path = proj_dir.join("src").join("main.rs");
     std::fs::write(&main_rs_path, MAIN_RS).inspect_err(|err| {
         print_error(format_args!(
             "failed to create {}: {}",
@@ -218,18 +227,15 @@ where
     command
         .arg("build")
         .arg("--target-dir")
-        .arg(proj_dir.path().join("target"));
+        .arg(proj_dir.join("target"));
 
     if settings.release {
         command.arg("--release");
     }
 
-    let output = command
-        .current_dir(proj_dir.path())
-        .output()
-        .inspect_err(|err| {
-            print_error(format_args!("failed to run cargo build: {}", err));
-        })?;
+    let output = command.current_dir(&proj_dir).output().inspect_err(|err| {
+        print_error(format_args!("failed to run cargo build: {}", err));
+    })?;
 
     if !output.status.success() {
         println!();
@@ -242,7 +248,6 @@ where
     }
 
     let target_path = proj_dir
-        .path()
         .join("target")
         .join(if !settings.release {
             "debug"

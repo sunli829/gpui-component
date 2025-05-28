@@ -73,6 +73,13 @@ struct Cli {
     command: Commands,
 }
 
+fn run_command(f: impl FnOnce() -> anyhow::Result<()>) {
+    match f() {
+        Ok(_) => std::process::exit(0),
+        Err(_) => std::process::exit(-1),
+    }
+}
+
 fn main() {
     let cli = Cli::parse();
 
@@ -89,7 +96,7 @@ fn main() {
                 platform,
                 force,
             };
-            _ = download_cef::download_cef(&settings);
+            run_command(|| download_cef::download_cef(&settings))
         }
         Commands::AddHelper {
             app_path,
@@ -107,7 +114,7 @@ fn main() {
                 release,
                 force,
             };
-            _ = add_helper::add_helper(&settings);
+            run_command(|| add_helper::add_helper(&settings))
         }
         Commands::AddFramework {
             app_path,
@@ -121,7 +128,7 @@ fn main() {
                 release,
                 force,
             };
-            _ = add_cef_framework::add_cef_framework(&settings);
+            run_command(|| add_cef_framework::add_cef_framework(&settings))
         }
     }
 }
