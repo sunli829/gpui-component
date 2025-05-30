@@ -97,7 +97,8 @@ void wef_shutdown() { CefShutdown(); }
 
 WefBrowser* wef_browser_create(const WefBrowserSettings* settings) {
   CefWindowInfo window_info;
-  window_info.SetAsWindowless(reinterpret_cast<CefWindowHandle>(settings->parent));
+  window_info.SetAsWindowless(
+      reinterpret_cast<CefWindowHandle>(settings->parent));
   window_info.runtime_style = CEF_RUNTIME_STYLE_ALLOY;
 
   CefBrowserSettings browser_settings;
@@ -125,7 +126,7 @@ WefBrowser* wef_browser_create(const WefBrowserSettings* settings) {
 
 void wef_browser_destroy(WefBrowser* browser) {
   if (browser->browser) {
-    (*browser->browser)->GetHost()->CloseBrowser(true);
+    (*browser->browser)->GetHost()->CloseBrowser(false);
   } else {
     browser->deleteBrowser = true;
   }
