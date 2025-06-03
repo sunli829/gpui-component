@@ -62,7 +62,6 @@ jobs:
         if: ${{ matrix.run_on == 'windows-latest' }}
         run: |
           echo CEF_ROOT=$HOME\.local\share\cef >> $env:GITHUB_ENV
-          dir $HOME/.local/share
       - name: Typo check
         if: ${{ matrix.run_on == 'macos-latest' }}
         run: |
