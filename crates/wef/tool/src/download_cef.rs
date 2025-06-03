@@ -90,7 +90,20 @@ fn download_file(url: &str, pb: &ProgressBar, path: &Path) -> Result<()> {
     Ok(())
 }
 
-fn extract_archive(archive_path: &Path, target_dir: &Path, pb: &ProgressBar) -> Result<()> {
+fn extract_archive(
+    archive_path: &Path,
+    target_dir: &Path,
+    root_dir_name: &str,
+    pb: &ProgressBar,
+) -> Result<()> {
+    std::fs::create_dir_all(target_dir).inspect_err(|err| {
+        print_error(format_args!(
+            "failed to create target directory {}: {}",
+            target_dir.display(),
+            err
+        ));
+    })?;
+
     let tar_bz2 = File::open(archive_path).inspect_err(|err| {
         print_error(format_args!(
             "failed to open archive {}: {}",
@@ -123,7 +136,17 @@ fn extract_archive(archive_path: &Path, target_dir: &Path, pb: &ProgressBar) -> 
             continue;
         }
 
-        entry.unpack_in(target_dir).inspect_err(|err| {
+        let entry_path = entry.path().unwrap();
+        let filepath = target_dir.join(entry_path.strip_prefix(root_dir_name).unwrap());
+        std::fs::create_dir_all(filepath.parent().unwrap()).inspect_err(|err| {
+            print_error(format_args!(
+                "failed to create directory for {}: {}",
+                filepath.display(),
+                err
+            ));
+        })?;
+
+        entry.unpack(target_dir.join(filepath)).inspect_err(|err| {
             print_error(format_args!(
                 "failed to extract file to {}: {}",
                 target_dir.display(),
@@ -188,14 +211,20 @@ pub(crate) fn download_cef(settings: &DownloadCefSettings) -> Result<()> {
 
     // Extract with progress
     let pb = create_extract_progress_bar();
-    extract_archive(&archive_path, &settings.path, &pb)?;
+    extract_archive(
+        &archive_path,
+        &settings.path,
+        &settings.platform.root_dir_name(&settings.version).unwrap(),
+        &pb,
+    )?;
     pb.finish_with_message("Extraction completed");
 
     println!("{}", "Successfully downloaded and extracted CEF!".green());
     println!();
 
-    let root_dir_name = settings.platform.root_dir_name(&settings.version).unwrap();
-
-    println!("Set the environment variable CEF_ROOT = {}", root_dir_name);
+    println!(
+        "Set the environment variable CEF_ROOT = {}",
+        settings.path.display()
+    );
     Ok(())
 }

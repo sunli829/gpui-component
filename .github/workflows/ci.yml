@@ -19,13 +19,10 @@ jobs:
         include:
           - target: aarch64-apple-darwin
             run_on: macos-latest
-            cef_arch: macosarm64
           - target: x86_64-linux-gnu
             run_on: ubuntu-latest
-            cef_arch: linux64
           - target: x86_64-windows-msvc
             run_on: windows-latest
-            cef_arch: windows64
     runs-on: ${{ matrix.run_on }}
     steps:
       - uses: actions/checkout@v4
@@ -50,21 +47,21 @@ jobs:
         id: cache-cef
         uses: actions/cache@v4
         with:
-          path: ~/.local/share/cef_binary_${{ env.CEF_VERSION }}_${{ matrix.cef_arch }}
-          key: cef-${{ env.CEF_VERSION }}-${{ matrix.cef_arch }}
+          path: ~/.local/share/cef
+          key: cef-${{ env.CEF_VERSION }}-${{ matrix.target }}
       - name: Download CEF
         if: ${{ !steps.cache-cef.outputs.cache-hit }}
         run: |
           mkdir -p $HOME/.local/share
-          cargo run -p wef-tool download-cef $HOME/.local/share
+          cargo run -p wef-tool download-cef $HOME/.local/share/cef
       - name: Set CEF_ROOT
         if: ${{ matrix.run_on != 'windows-latest' }}
         run: |
-          echo CEF_ROOT=$HOME/.local/share/cef_binary_${{ env.CEF_VERSION }}_${{ matrix.cef_arch }} >> $GITHUB_ENV
+          echo CEF_ROOT=$HOME/.local/share/cef >> $GITHUB_ENV
       - name: Set CEF_ROOT on windows
         if: ${{ matrix.run_on == 'windows-latest' }}
         run: |
-          echo CEF_ROOT=$HOME\.local\share\cef_binary_${{ env.CEF_VERSION }}_${{ matrix.cef_arch }} >> $env:GITHUB_ENV
+          echo CEF_ROOT=$HOME\.local\share\cef >> $env:GITHUB_ENV
           dir $HOME/.local/share
       - name: Typo check
         if: ${{ matrix.run_on == 'macos-latest' }}
