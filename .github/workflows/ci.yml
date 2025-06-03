@@ -47,7 +47,7 @@ jobs:
         id: cache-cef
         uses: actions/cache@v4
         with:
-          path: ~/.local/share/cef
+          path: $HOME/.local/share/cef
           key: cef-${{ env.CEF_VERSION }}-${{ matrix.target }}
       - name: Download CEF
         if: ${{ !steps.cache-cef.outputs.cache-hit }}
