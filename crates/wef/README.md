@@ -263,6 +263,14 @@ To install the `wef-tool`, you can use the following command:
 cargo install wef-tool
 ```
 
+### Init Wef
+
+The `init` command used to init and download CEF into your system.
+
+```bash
+wef-tool init
+```
+
 ### Add CEF3 Framework to the MacOS App Bundle
 
 ```bash
