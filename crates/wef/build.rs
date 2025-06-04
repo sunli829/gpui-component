@@ -2,10 +2,19 @@ use std::path::{Path, PathBuf};
 
 use cc::Build;
 
+/// Return the CEF_ROOT env or default path: `$HOME/.local/share/cef`
+fn cef_root() -> PathBuf {
+    if let Ok(path) = std::env::var("CEF_ROOT") {
+        return Path::new(&path).to_path_buf();
+    }
+
+    std::env::home_dir()
+        .expect("failed get home_dir")
+        .join(".local/share/cef")
+}
+
 fn main() {
-    let cef_root = PathBuf::from(std::env::var("CEF_ROOT").unwrap_or_else(|_| {
-        panic!("CEF_ROOT environment variable is not set.");
-    }));
+    let cef_root = cef_root();
     println!("cargo::rerun-if-changed={}", cef_root.display());
 
     let profile = match std::env::var("DEBUG") {

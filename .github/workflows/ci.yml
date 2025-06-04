@@ -52,16 +52,7 @@ jobs:
       - name: Download CEF
         if: ${{ !steps.cache-cef.outputs.cache-hit }}
         run: |
-          mkdir -p $HOME/.local/share
-          cargo run -p wef-tool download-cef $HOME/.local/share/cef
-      - name: Set CEF_ROOT
-        if: ${{ matrix.run_on != 'windows-latest' }}
-        run: |
-          echo CEF_ROOT=$HOME/.local/share/cef >> $GITHUB_ENV
-      - name: Set CEF_ROOT on windows
-        if: ${{ matrix.run_on == 'windows-latest' }}
-        run: |
-          echo CEF_ROOT=$HOME\.local\share\cef >> $env:GITHUB_ENV
+          cargo run -p wef-tool init
       - name: Typo check
         if: ${{ matrix.run_on == 'macos-latest' }}
         run: |

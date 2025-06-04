@@ -2,6 +2,7 @@ mod add_cef_framework;
 mod add_helper;
 mod cef_platform;
 mod download_cef;
+mod init;
 mod utils;
 
 use std::path::PathBuf;
@@ -18,7 +19,7 @@ enum Commands {
         path: PathBuf,
         /// CEF version
         #[clap(long, default_value = DEFAULT_CEF_VERSION)]
-        version: String,
+        version: Option<String>,
         /// Platform
         #[clap(long, default_value = "auto")]
         platform: CefBuildsPlatform,
@@ -63,6 +64,10 @@ enum Commands {
         #[clap(long, short, default_value_t = false)]
         force: bool,
     },
+    /// Init the CEF framework for the current platform.
+    ///
+    /// set the CEF_ROOT environment variable and create the CEF directory if it doesn't exist.
+    Init,
 }
 
 /// Wef CLI tool
@@ -82,6 +87,8 @@ fn run_command(f: impl FnOnce() -> anyhow::Result<()>) {
 
 fn main() {
     let cli = Cli::parse();
+
+    _ = init::set_env();
 
     match cli.command {
         Commands::DownloadCef {
@@ -130,5 +137,6 @@ fn main() {
             };
             run_command(|| add_cef_framework::add_cef_framework(&settings))
         }
+        Commands::Init => run_command(|| init::init()),
     }
 }

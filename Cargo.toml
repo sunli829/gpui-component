@@ -6,7 +6,7 @@ members = [
     "crates/wef/tool",
     "crates/wef/examples/wef-winit-example",
     "crates/webview",
-    "crates/webview/examples/wef-gpui-example",
+    "crates/webview/examples/wef-example",
 ]
 
 default-members = ["crates/story"]

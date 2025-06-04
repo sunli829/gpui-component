@@ -9030,7 +9030,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "wef-gpui-example"
+name = "wef-example"
 version = "0.1.0"
 dependencies = [
  "gpui",

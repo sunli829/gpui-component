@@ -52,7 +52,7 @@ impl Main {
         cx.new(|cx| {
             // create webview
             let webview = WebView::with_func_registry(
-                "https://www.rust-lang.org",
+                "https://rust-lang.org",
                 func_registry.clone(),
                 window,
                 cx,
@@ -66,7 +66,7 @@ impl Main {
 
             // create address input
             let address_state =
-                cx.new(|cx| InputState::new(window, cx).default_value("https://www.rust-lang.org"));
+                cx.new(|cx| InputState::new(window, cx).default_value("https://rust-lang.org"));
 
             window
                 .subscribe(&address_state, cx, {

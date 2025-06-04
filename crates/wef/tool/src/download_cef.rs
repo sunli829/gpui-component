@@ -10,14 +10,22 @@ use indicatif::{ProgressBar, ProgressStyle};
 use reqwest::blocking::Client;
 use tar::EntryType;
 
-use crate::{cef_platform::CefBuildsPlatform, utils::print_error};
+use crate::{DEFAULT_CEF_VERSION, cef_platform::CefBuildsPlatform, utils::print_error};
 
 #[derive(Debug)]
 pub(crate) struct DownloadCefSettings {
     pub(crate) path: PathBuf,
-    pub(crate) version: String,
+    pub(crate) version: Option<String>,
     pub(crate) platform: CefBuildsPlatform,
     pub(crate) force: bool,
+}
+
+impl DownloadCefSettings {
+    fn version(&self) -> String {
+        self.version
+            .clone()
+            .unwrap_or(DEFAULT_CEF_VERSION.to_string())
+    }
 }
 
 fn create_download_progress_bar() -> ProgressBar {
@@ -167,11 +175,12 @@ pub(crate) fn download_cef(settings: &DownloadCefSettings) -> Result<()> {
             "--force".bright_white(),
             settings.path.display()
         );
+        return Ok(());
     }
 
     let url = settings
         .platform
-        .download_url(&settings.version)
+        .download_url(&settings.version())
         .ok_or_else(|| anyhow::anyhow!("unsupported platform: {:?}", settings.platform))?;
 
     println!("Downloading CEF from {}...", url);
@@ -214,7 +223,10 @@ pub(crate) fn download_cef(settings: &DownloadCefSettings) -> Result<()> {
     extract_archive(
         &archive_path,
         &settings.path,
-        &settings.platform.root_dir_name(&settings.version).unwrap(),
+        &settings
+            .platform
+            .root_dir_name(&settings.version())
+            .unwrap(),
         &pb,
     )?;
     pb.finish_with_message("Extraction completed");
