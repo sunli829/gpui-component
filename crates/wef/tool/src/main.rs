@@ -1,14 +1,12 @@
-mod add_cef_framework;
-mod add_helper;
-mod cef_platform;
-mod init;
-mod utils;
+mod commands;
+mod internal;
 
 use std::path::PathBuf;
 
 use clap::{Parser, Subcommand};
+use colored::Colorize;
 
-use crate::cef_platform::{CefBuildsPlatform, DEFAULT_CEF_VERSION};
+use crate::internal::{CefBuildsPlatform, DEFAULT_CEF_VERSION};
 
 #[derive(Subcommand)]
 enum Commands {
@@ -27,10 +25,20 @@ enum Commands {
         #[clap(long, short, default_value_t = false)]
         force: bool,
     },
-    /// Add helper processes to the app
-    AddHelper {
-        /// Target app path
-        app_path: PathBuf,
+    /// Compile a local package and all of its dependencies
+    Build {
+        /// Package to build (see `cargo help pkgid`)
+        #[clap(long, short, value_name = "SPEC")]
+        package: Option<String>,
+        /// Build only the specified binary
+        #[clap(long, value_name = "NAME")]
+        bin: Option<String>,
+        /// Build only the specified example
+        #[clap(long, value_name = "NAME")]
+        example: Option<String>,
+        /// Build artifacts in release mode, with optimizations
+        #[clap(long, short)]
+        release: bool,
         /// Use the specified Wef version
         ///
         /// If not specified, use the latest version
@@ -40,27 +48,67 @@ enum Commands {
         /// published version
         #[clap(long)]
         wef_path: Option<PathBuf>,
+    },
+    /// Run a binary or example of the local package
+    Run {
+        /// Package to build (see `cargo help pkgid`)
+        #[clap(long, short, value_name = "SPEC")]
+        package: Option<String>,
+        /// Build only the specified binary
+        #[clap(long, value_name = "NAME")]
+        bin: Option<String>,
+        /// Build only the specified example
+        #[clap(long, value_name = "NAME")]
+        example: Option<String>,
         /// Build artifacts in release mode, with optimizations
         #[clap(long, short)]
         release: bool,
-        /// Force adding the helper processes even if they already exist
-        #[clap(long, short, default_value_t = false)]
-        force: bool,
+        /// Use the specified Wef version
+        ///
+        /// If not specified, use the latest version
+        #[clap(long)]
+        wef_version: Option<String>,
+        /// Specify the source code path of the local Wef library instead of the
+        /// published version
+        #[clap(long)]
+        wef_path: Option<PathBuf>,
+        #[arg(last = true)]
+        args: Vec<String>,
     },
-    /// Add CEF framework to the app
-    AddFramework {
-        /// Target app path
-        app_path: PathBuf,
-        /// CEF root path
-        #[clap(long, env = "CEF_ROOT")]
-        cef_root: Option<PathBuf>,
-        /// Build artifacts in release mode, with optimizations
-        #[clap(long, short)]
-        release: bool,
-        /// Force adding the framework even if it already exists
-        #[clap(long, short, default_value_t = false)]
-        force: bool,
-    },
+    // /// Add helper processes to the app
+    // AddHelper {
+    //     /// Target app path
+    //     app_path: PathBuf,
+    //     /// Use the specified Wef version
+    //     ///
+    //     /// If not specified, use the latest version
+    //     #[clap(long)]
+    //     wef_version: Option<String>,
+    //     /// Specify the source code path of the local Wef library instead of the
+    //     /// published version
+    //     #[clap(long)]
+    //     wef_path: Option<PathBuf>,
+    //     /// Build artifacts in release mode, with optimizations
+    //     #[clap(long, short)]
+    //     release: bool,
+    //     /// Force adding the helper processes even if they already exist
+    //     #[clap(long, short, default_value_t = false)]
+    //     force: bool,
+    // },
+    // /// Add CEF framework to the app
+    // AddFramework {
+    //     /// Target app path
+    //     app_path: PathBuf,
+    //     /// CEF root path
+    //     #[clap(long, env = "CEF_ROOT")]
+    //     cef_root: Option<PathBuf>,
+    //     /// Build artifacts in release mode, with optimizations
+    //     #[clap(long, short)]
+    //     release: bool,
+    //     /// Force adding the framework even if it already exists
+    //     #[clap(long, short, default_value_t = false)]
+    //     force: bool,
+    // },
 }
 
 /// Wef CLI tool
@@ -71,66 +119,53 @@ struct Cli {
     command: Commands,
 }
 
-fn run_command(f: impl FnOnce() -> anyhow::Result<()>) {
-    match f() {
-        Ok(_) => std::process::exit(0),
-        Err(_) => std::process::exit(-1),
-    }
-}
-
 fn main() {
     let cli = Cli::parse();
 
-    match cli.command {
+    let res = match cli.command {
         Commands::Init {
             path,
             version,
             platform,
             force,
-        } => {
-            let path = path.unwrap_or_else(|| {
-                let home_path = dirs::home_dir().expect("Failed to get home directory");
-                let path = home_path.join(".cef");
-                println!("No path specified, using default: {}", path.display());
-                path
-            });
-            let settings = init::DownloadCefSettings {
-                path,
-                version,
-                platform,
-                force,
-            };
-            run_command(|| init::download_cef(&settings))
-        }
-        Commands::AddHelper {
-            app_path,
+        } => commands::init(path, version, platform, force),
+        Commands::Build {
+            package,
+            bin,
+            example,
+            release,
             wef_version,
             wef_path,
+        } => commands::build(
+            package,
+            bin,
+            example,
             release,
-            force,
-        } => {
-            let settings = add_helper::AddHelperSettings {
-                app_path,
-                wef_version,
-                wef_path,
-                release,
-                force,
-            };
-            run_command(|| add_helper::add_helper(&settings))
-        }
-        Commands::AddFramework {
-            app_path,
-            cef_root,
+            wef_version.as_deref(),
+            wef_path.as_deref(),
+        )
+        .map(|_| ()),
+        Commands::Run {
+            package,
+            bin,
+            example,
             release,
-            force,
-        } => {
-            let settings = add_cef_framework::AddCefFrameworkSettings {
-                cef_root,
-                app_path,
-                release,
-                force,
-            };
-            run_command(|| add_cef_framework::add_cef_framework(&settings))
-        }
+            wef_version,
+            wef_path,
+            args,
+        } => commands::run(
+            package,
+            bin,
+            example,
+            release,
+            wef_version.as_deref(),
+            wef_path.as_deref(),
+            args,
+        ),
+    };
+
+    if let Err(err) = res {
+        eprintln!("{}: {}", "Error".red(), err);
+        std::process::exit(-1);
     }
 }
