@@ -41,15 +41,14 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/
-            ~/.cef
           key: test-cargo-${{ matrix.target }}-${{ hashFiles('**/Cargo.lock') }}
       - name: Cache CEF
         id: cache-cef
         uses: actions/cache@v4
         with:
-          path: $HOME/.local/share/cef
+          path: $HOME/.cef
           key: cef-${{ env.CEF_VERSION }}-${{ matrix.target }}
-      - name: Download CEF
+      - name: Init CEF
         if: ${{ !steps.cache-cef.outputs.cache-hit }}
         run: |
           cargo run -p wef-tool init

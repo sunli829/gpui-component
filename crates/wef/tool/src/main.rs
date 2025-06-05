@@ -1,7 +1,6 @@
 mod add_cef_framework;
 mod add_helper;
 mod cef_platform;
-mod download_cef;
 mod init;
 mod utils;
 
@@ -14,12 +13,13 @@ use crate::cef_platform::{CefBuildsPlatform, DEFAULT_CEF_VERSION};
 #[derive(Subcommand)]
 enum Commands {
     /// Download CEF framework
-    DownloadCef {
+    Init {
         /// Target path
-        path: PathBuf,
+        #[clap(long)]
+        path: Option<PathBuf>,
         /// CEF version
         #[clap(long, default_value = DEFAULT_CEF_VERSION)]
-        version: Option<String>,
+        version: String,
         /// Platform
         #[clap(long, default_value = "auto")]
         platform: CefBuildsPlatform,
@@ -31,9 +31,6 @@ enum Commands {
     AddHelper {
         /// Target app path
         app_path: PathBuf,
-        /// CEF root path
-        #[clap(long, env = "CEF_ROOT")]
-        cef_root: Option<PathBuf>,
         /// Use the specified Wef version
         ///
         /// If not specified, use the latest version
@@ -64,10 +61,6 @@ enum Commands {
         #[clap(long, short, default_value_t = false)]
         force: bool,
     },
-    /// Init the CEF framework for the current platform.
-    ///
-    /// set the CEF_ROOT environment variable and create the CEF directory if it doesn't exist.
-    Init,
 }
 
 /// Wef CLI tool
@@ -88,33 +81,35 @@ fn run_command(f: impl FnOnce() -> anyhow::Result<()>) {
 fn main() {
     let cli = Cli::parse();
 
-    _ = init::set_env();
-
     match cli.command {
-        Commands::DownloadCef {
+        Commands::Init {
             path,
             version,
             platform,
             force,
         } => {
-            let settings = download_cef::DownloadCefSettings {
+            let path = path.unwrap_or_else(|| {
+                let home_path = dirs::home_dir().expect("Failed to get home directory");
+                let path = home_path.join(".cef");
+                println!("No path specified, using default: {}", path.display());
+                path
+            });
+            let settings = init::DownloadCefSettings {
                 path,
                 version,
                 platform,
                 force,
             };
-            run_command(|| download_cef::download_cef(&settings))
+            run_command(|| init::download_cef(&settings))
         }
         Commands::AddHelper {
             app_path,
-            cef_root,
             wef_version,
             wef_path,
             release,
             force,
         } => {
             let settings = add_helper::AddHelperSettings {
-                cef_root,
                 app_path,
                 wef_version,
                 wef_path,
@@ -137,6 +132,5 @@ fn main() {
             };
             run_command(|| add_cef_framework::add_cef_framework(&settings))
         }
-        Commands::Init => run_command(|| init::init()),
     }
 }

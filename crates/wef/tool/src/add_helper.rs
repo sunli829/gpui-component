@@ -9,11 +9,10 @@ use askama::Template;
 use colored::Colorize;
 use serde::Deserialize;
 
-use crate::utils::{find_cef_root, print_error};
+use crate::utils::print_error;
 
 #[derive(Debug)]
 pub(crate) struct AddHelperSettings {
-    pub(crate) cef_root: Option<PathBuf>,
     pub(crate) app_path: PathBuf,
     pub(crate) wef_version: Option<String>,
     pub(crate) wef_path: Option<PathBuf>,
@@ -350,8 +349,6 @@ fn create_helper_app(
 }
 
 pub(crate) fn add_helper(settings: &AddHelperSettings) -> Result<()> {
-    _ = find_cef_root(settings.cef_root.as_deref())?;
-
     println!(
         "Creating helper app into {}...",
         settings.app_path.display()

@@ -89,7 +89,7 @@ pub(crate) fn add_cef_framework(settings: &AddCefFrameworkSettings) -> Result<()
 
 #[cfg(target_os = "windows")]
 pub(crate) fn add_cef_framework(settings: &AddCefFrameworkSettings) -> Result<()> {
-    let cef_root = find_cef_root(settings.cef_root.as_deref())?;
+    let cef_root = find_cef_root(settings.cef_root.as_deref());
 
     println!(
         "Adding CEF framework into {}...",

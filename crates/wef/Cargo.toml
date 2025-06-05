@@ -11,6 +11,7 @@ description = "Wef is a Rust library for embedding WebView functionality using C
 [build-dependencies]
 cc = { version = "1.2.18", features = ["parallel"] }
 pkg-config = "0.3.32"
+dirs = "6.0.0"
 
 [dependencies]
 image = { version = "0.25.6", default-features = false }

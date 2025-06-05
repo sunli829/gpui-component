@@ -2,15 +2,13 @@ use std::path::{Path, PathBuf};
 
 use cc::Build;
 
-/// Return the CEF_ROOT env or default path: `$HOME/.local/share/cef`
+/// Return the CEF_ROOT env or default path: `$HOME/.cef`
 fn cef_root() -> PathBuf {
     if let Ok(path) = std::env::var("CEF_ROOT") {
         return Path::new(&path).to_path_buf();
     }
 
-    std::env::home_dir()
-        .expect("failed get home_dir")
-        .join(".local/share/cef")
+    dirs::home_dir().expect("get home_dir").join(".cef")
 }
 
 fn main() {
