@@ -140,7 +140,6 @@ pub(crate) fn build(
 
     match std::env::consts::OS {
         "macos" => {
-            add_cef_framework(&cef_root, target_dir.as_std_path(), release, true)?;
             let exec_path = execute_path(
                 &metadata,
                 target_dir.as_std_path(),

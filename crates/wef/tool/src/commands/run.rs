@@ -17,6 +17,8 @@ pub(crate) fn run(
         "macos" => {
             let mut command = Command::new("open");
             command.arg(&exec_path);
+            command.arg("-W");
+            command.arg("--args");
             command
         }
         "windows" | "linux" => Command::new(&exec_path),
