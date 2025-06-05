@@ -40,7 +40,7 @@ impl State {
         let browser = Browser::builder()
             .size(inner_size.width, inner_size.height)
             .device_scale_factor(scale_factor)
-            .url("https://www.rust-lang.org/")
+            .url("https://rust-lang.org")
             .handler(MyHandler {
                 scale_factor,
                 surface,

@@ -34,13 +34,13 @@
     In the project root directory, run the following command:
 
     ```bash
-    cargo build -p wef-winit-example
+    cargo build -p wef-example
     ```
 
 4. Bundle the application
 
     ```
-    cargo bundle -p wef-winit-example
+    cargo bundle --example wef-example
     ```
 
 5. Add helper processes to the application bundle

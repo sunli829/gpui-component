@@ -9060,7 +9060,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "wef-winit-example"
+name = "wef-winit"
 version = "0.1.0"
 dependencies = [
  "image",
