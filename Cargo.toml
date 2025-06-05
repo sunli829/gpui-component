@@ -53,11 +53,3 @@ resvg = { opt-level = 3 }
 rustybuzz = { opt-level = 3 }
 taffy = { opt-level = 3 }
 ttf-parser = { opt-level = 3 }
-
-[package.metadata.bundle.wef-winit]
-name = "wef-winit"
-identifier = "longbridge.wef-winit"
-
-[package.metadata.bundle.wef-example]
-name = "wef-example"
-identifier = "longbridge.wef-example"
