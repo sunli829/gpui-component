@@ -58,7 +58,11 @@ extern "C" {
 bool wef_init(const WefSettings* wef_settings) {
   CefSettings settings;
   settings.windowless_rendering_enabled = true;
+#ifdef __APPLE__
   settings.no_sandbox = true;
+#else
+  settings.no_sandbox = false;
+#endif
   settings.external_message_pump = true;
 
   if (wef_settings->locale) {

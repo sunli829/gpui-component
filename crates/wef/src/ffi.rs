@@ -116,6 +116,15 @@ unsafe extern "C" {
     #[cfg(target_os = "macos")]
     pub(crate) unsafe fn wef_unload_library(loader: *mut c_void);
 
+    #[cfg(target_os = "macos")]
+    pub(crate) unsafe fn wef_sandbox_context_create(
+        args: *const *const c_char,
+        count: i32,
+    ) -> *mut c_void;
+
+    #[cfg(target_os = "macos")]
+    pub(crate) unsafe fn wef_sandbox_context_destroy(loader: *mut c_void);
+
     pub(crate) unsafe fn wef_init(settings: *const CSettings) -> bool;
 
     pub(crate) unsafe fn wef_exec_process(args: *const *const c_char, count: i32) -> bool;

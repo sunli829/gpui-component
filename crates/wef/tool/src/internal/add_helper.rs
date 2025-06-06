@@ -29,6 +29,7 @@ struct TemplateCargoToml {
 
 const MAIN_RS: &str = r#"
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let _ = wef::SandboxContext::new();
     let _ = wef::FrameworkLoader::load_in_helper()?;
     wef::exec_process()?;
     Ok(())

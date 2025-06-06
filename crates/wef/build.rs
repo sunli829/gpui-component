@@ -264,7 +264,11 @@ fn build_wef_sys(cef_root: &Path) {
 
     #[cfg(target_os = "macos")]
     {
-        sources.extend(["cpp/load_library.cpp", "cpp/external_pump_mac.mm"]);
+        sources.extend([
+            "cpp/load_library.cpp",
+            "cpp/sandbox_context.cpp",
+            "cpp/external_pump_mac.mm",
+        ]);
     }
 
     #[cfg(target_os = "windows")]

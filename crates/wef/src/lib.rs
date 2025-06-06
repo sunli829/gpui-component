@@ -18,6 +18,8 @@ mod geom;
 mod input;
 mod js_dialog;
 mod query;
+#[cfg(target_os = "macos")]
+mod sandbox_context;
 mod settings;
 mod wef;
 
@@ -43,6 +45,8 @@ pub use func_registry::{
 pub use geom::{Point, Rect, Size};
 pub use input::{KeyCode, KeyModifier, MouseButton};
 pub use js_dialog::{JsDialogCallback, JsDialogType};
+#[cfg(target_os = "macos")]
+pub use sandbox_context::SandboxContext;
 pub use serde_json::Value;
 pub use settings::Settings;
 pub use wef::*;
