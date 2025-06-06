@@ -219,6 +219,7 @@ impl Element for WebViewElement {
                             event.click_count,
                             modifiers,
                         );
+                        webview.browser().set_focus(true);
                     }
                 }
             }
