@@ -107,7 +107,7 @@ WefBrowser* wef_browser_create(const WefBrowserSettings* settings) {
   window_info.runtime_style = CEF_RUNTIME_STYLE_ALLOY;
 
   CefBrowserSettings browser_settings;
-  browser_settings.windowless_frame_rate = settings->frame_rate;
+  // browser_settings.windowless_frame_rate = settings->frame_rate;
   browser_settings.background_color = CefColorSetARGB(255, 255, 255, 255);
 
   WefBrowser* wef_browser = new WefBrowser;

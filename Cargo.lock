@@ -2169,6 +2169,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "60b1af1c220855b6ceac025d3f6ecdd2b7c4894bfe9cd9bda4fbb4bc7c0d4cf0"
 
 [[package]]
+name = "embed-manifest"
+version = "1.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "41cd446c890d6bed1d8b53acef5f240069ebef91d6fae7c5f52efe61fe8b5eae"
+
+[[package]]
 name = "embed-resource"
 version = "3.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -9142,6 +9148,7 @@ dependencies = [
 name = "wef-example"
 version = "0.1.0"
 dependencies = [
+ "embed-manifest",
  "gpui",
  "gpui-component",
  "gpui-webview",
@@ -9152,6 +9159,7 @@ dependencies = [
 name = "wef-winit"
 version = "0.1.0"
 dependencies = [
+ "embed-manifest",
  "image",
  "softbuffer",
  "wef",

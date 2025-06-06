@@ -3,8 +3,6 @@
 #include <iostream>
 #include <limits>
 
-#define NOMINMAX
-
 #include "browser_callbacks.h"
 #include "frame.h"
 #include "include/cef_browser.h"
@@ -25,6 +23,7 @@ class WefClient : public CefClient,
                   public CefJSDialogHandler,
                   public CefRequestHandler,
                   public CefFocusHandler,
+                  public CefPermissionHandler,
                   public CefMessageRouterBrowserSide::Handler {
   IMPLEMENT_REFCOUNTING(WefClient);
 
@@ -81,6 +80,9 @@ class WefClient : public CefClient,
   CefRefPtr<CefFindHandler> GetFindHandler() override { return this; }
   CefRefPtr<CefJSDialogHandler> GetJSDialogHandler() override { return this; }
   CefRefPtr<CefFocusHandler> GetFocusHandler() override { return this; }
+  CefRefPtr<CefPermissionHandler> GetPermissionHandler() override {
+    return this;
+  }
 
   bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
                                 CefRefPtr<CefFrame> frame,
@@ -366,6 +368,17 @@ class WefClient : public CefClient,
 
   bool OnSetFocus(CefRefPtr<CefBrowser> browser, FocusSource source) override {
     return false;
+  }
+
+  /////////////////////////////////////////////////////////////////
+  // CefPermissionHandler methods
+  /////////////////////////////////////////////////////////////////
+  bool OnRequestMediaAccessPermission(
+      CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
+      const CefString& requesting_origin, uint32_t requested_permissions,
+      CefRefPtr<CefMediaAccessCallback> callback) override {
+    callback->Continue(CEF_MEDIA_PERMISSION_NONE);
+    return true;
   }
 
   /////////////////////////////////////////////////////////////////

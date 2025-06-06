@@ -3,6 +3,9 @@ name = "wef-example"
 version = "0.1.0"
 edition = "2024"
 
+[build-dependencies]
+embed-manifest = "1.4.0"
+
 [dependencies]
 gpui-webview = { path = "../../" }
 gpui.workspace = true
