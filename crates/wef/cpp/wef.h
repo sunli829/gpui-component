@@ -7,6 +7,7 @@
 
 struct WefBrowser {
   std::string url;
+  bool focus;
   CefRefPtr<WefClient> client;
   bool deleteBrowser = false;
   std::optional<CefRefPtr<CefBrowser>> browser;

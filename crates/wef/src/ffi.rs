@@ -215,6 +215,8 @@ unsafe extern "C" {
         find_next: bool,
     );
 
+    pub(crate) unsafe fn wef_browser_set_focus(browser: *mut wef_browser_t, focus: bool);
+
     pub(crate) unsafe fn wef_dirty_rects_len(dirty_rects: *const c_void) -> i32;
 
     pub(crate) unsafe fn wef_dirty_rects_get(

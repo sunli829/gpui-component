@@ -3,7 +3,8 @@ use std::{ops::Range, rc::Rc};
 use gpui::{
     App, Bounds, ClipboardItem, CursorStyle, Empty, Entity, EntityInputHandler, EventEmitter,
     FocusHandle, Focusable, KeyDownEvent, KeyUpEvent, MouseDownEvent, Pixels, ScrollWheelEvent,
-    UTF16Selection, WeakEntity, Window, anchored, deferred, div, point, prelude::*, px,
+    Subscription, UTF16Selection, WeakEntity, Window, anchored, deferred, div, point, prelude::*,
+    px,
 };
 use wef::{Browser, FuncRegistry, LogicalUnit, Point, Rect};
 
@@ -26,6 +27,7 @@ pub struct WebView {
     pub(crate) bounds: Bounds<Pixels>,
     focus_handle: FocusHandle,
     browser: Rc<Browser>,
+    _subscriptions: Vec<Subscription>,
 }
 
 impl WebView {
@@ -64,8 +66,15 @@ impl WebView {
                     .build(),
             );
 
+            let focus_handle = cx.focus_handle();
+
+            let _subscriptions = vec![
+                cx.on_focus(&focus_handle, window, Self::on_focus),
+                cx.on_blur(&focus_handle, window, Self::on_blur),
+            ];
+
             Self {
-                focus_handle: cx.focus_handle(),
+                focus_handle,
                 main: FrameView::default(),
                 popup: None,
                 popup_rect: None,
@@ -73,6 +82,7 @@ impl WebView {
                 cursor: CursorStyle::Arrow,
                 context_menu: None,
                 bounds: Bounds::default(),
+                _subscriptions,
             }
         });
 
@@ -131,6 +141,14 @@ impl WebView {
             return;
         };
         self.browser().send_key_event(false, key_code, modifiers);
+    }
+
+    fn on_focus(&mut self, _window: &mut Window, _cx: &mut Context<Self>) {
+        self.browser().set_focus(true);
+    }
+
+    fn on_blur(&mut self, _window: &mut Window, _cx: &mut Context<Self>) {
+        self.browser().set_focus(false);
     }
 
     fn on_context_menu_action(

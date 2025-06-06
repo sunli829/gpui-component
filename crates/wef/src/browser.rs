@@ -205,4 +205,9 @@ impl Browser {
             )
         };
     }
+
+    /// Set whether the browser is focused.
+    pub fn set_focus(&self, focus: bool) {
+        unsafe { wef_browser_set_focus(self.wef_browser, focus) };
+    }
 }

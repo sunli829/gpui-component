@@ -5,7 +5,8 @@
 You should init the Wef first.
 
 ```bash
-cargo run -p wef-tool init
+cargo install cargo-wef
+cargo wef init
 ```
 
 ## Run example

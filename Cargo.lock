@@ -1099,6 +1099,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "cargo-wef"
+version = "0.5.0"
+dependencies = [
+ "anyhow",
+ "askama",
+ "bzip2",
+ "cargo_metadata",
+ "clap",
+ "colored",
+ "dirs 6.0.0",
+ "fs_extra",
+ "indicatif",
+ "plist",
+ "reqwest 0.12.15 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde",
+ "tar",
+ "tempfile",
+]
+
+[[package]]
 name = "cargo_metadata"
 version = "0.20.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -9101,7 +9121,7 @@ checksum = "53a85b86a771b1c87058196170769dd264f66c0782acf1ae6cc51bfd64b39082"
 
 [[package]]
 name = "wef"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "bitflags 2.9.1",
  "cc",
@@ -9126,26 +9146,6 @@ dependencies = [
  "gpui-component",
  "gpui-webview",
  "serde",
-]
-
-[[package]]
-name = "wef-tool"
-version = "0.4.0"
-dependencies = [
- "anyhow",
- "askama",
- "bzip2",
- "cargo_metadata",
- "clap",
- "colored",
- "dirs 6.0.0",
- "fs_extra",
- "indicatif",
- "plist",
- "reqwest 0.12.15 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde",
- "tar",
- "tempfile",
 ]
 
 [[package]]

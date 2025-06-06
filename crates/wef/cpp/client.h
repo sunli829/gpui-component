@@ -24,6 +24,7 @@ class WefClient : public CefClient,
                   public CefContextMenuHandler,
                   public CefJSDialogHandler,
                   public CefRequestHandler,
+                  public CefFocusHandler,
                   public CefMessageRouterBrowserSide::Handler {
   IMPLEMENT_REFCOUNTING(WefClient);
 
@@ -79,6 +80,7 @@ class WefClient : public CefClient,
   }
   CefRefPtr<CefFindHandler> GetFindHandler() override { return this; }
   CefRefPtr<CefJSDialogHandler> GetJSDialogHandler() override { return this; }
+  CefRefPtr<CefFocusHandler> GetFocusHandler() override { return this; }
 
   bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
                                 CefRefPtr<CefFrame> frame,
@@ -242,9 +244,7 @@ class WefClient : public CefClient,
   }
 
   void OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
-                 int httpStatusCode) override {
-    callbacks_.on_load_end(userdata_, new WefFrame{frame});
-  }
+                 int httpStatusCode) override;
 
   void OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
                    ErrorCode errorCode, const CefString& errorText,
@@ -356,6 +356,15 @@ class WefClient : public CefClient,
                       CefRefPtr<CefRequest> request, bool user_gesture,
                       bool is_redirect) override {
     message_router_->OnBeforeBrowse(browser, frame);
+    return false;
+  }
+
+  /////////////////////////////////////////////////////////////////
+  // CefFocusHandler methods
+  /////////////////////////////////////////////////////////////////
+  void OnTakeFocus(CefRefPtr<CefBrowser> browser, bool next) override {}
+
+  bool OnSetFocus(CefRefPtr<CefBrowser> browser, FocusSource source) override {
     return false;
   }
 

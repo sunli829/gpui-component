@@ -41,6 +41,14 @@ void WefClient::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
   callbacks_.on_created(userdata_);
 }
 
+void WefClient::OnLoadEnd(CefRefPtr<CefBrowser> browser,
+                          CefRefPtr<CefFrame> frame, int httpStatusCode) {
+  callbacks_.on_load_end(userdata_, new WefFrame{frame});
+  if (wef_browser_->browser) {
+    (*wef_browser_->browser)->GetHost()->SetFocus(wef_browser_->focus);
+  }
+}
+
 void WefClient::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
   message_router_->OnBeforeClose(browser);
   delete wef_browser_;

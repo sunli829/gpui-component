@@ -50,13 +50,10 @@ impl Main {
             .build();
 
         cx.new(|cx| {
+            let url = "https://www.google.com";
+
             // create webview
-            let webview = WebView::with_func_registry(
-                "https://rust-lang.org",
-                func_registry.clone(),
-                window,
-                cx,
-            );
+            let webview = WebView::with_func_registry(url, func_registry.clone(), window, cx);
 
             window
                 .subscribe(&webview, cx, |_, event: &TitleChangedEvent, window, _| {
@@ -65,8 +62,7 @@ impl Main {
                 .detach();
 
             // create address input
-            let address_state =
-                cx.new(|cx| InputState::new(window, cx).default_value("https://rust-lang.org"));
+            let address_state = cx.new(|cx| InputState::new(window, cx).default_value(url));
 
             window
                 .subscribe(&address_state, cx, {

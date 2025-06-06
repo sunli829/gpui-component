@@ -39,6 +39,10 @@ pub(crate) fn build_context_menu(
     use wef::{ContextMenuEditStateFlags as EditStateFlags, ContextMenuTypeFlags as TypeFlags};
 
     PopupMenu::build(window, cx, |mut popmenu, _window, cx| {
+        if params.type_.contains(TypeFlags::SELECTION) {
+            popmenu = popmenu.menu("Copy", Box::new(ContextMenuAction::Copy));
+        }
+
         if params.type_.contains(TypeFlags::LINK) {
             popmenu = popmenu.menu(
                 "Copy link address",

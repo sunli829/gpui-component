@@ -117,6 +117,7 @@ WefBrowser* wef_browser_create(const WefBrowserSettings* settings) {
                                 browser_settings, extra_info, nullptr);
 
   wef_browser->url = settings->url;
+  wef_browser->focus = false;
   wef_browser->client = client;
   wef_browser->browser = std::nullopt;
   wef_browser->cursorX = 0;
@@ -374,6 +375,14 @@ void wef_browser_find(WefBrowser* browser, const char* search_text,
   (*browser->browser)
       ->GetHost()
       ->Find(search_text, forward, match_case, find_next);
+}
+
+void wef_browser_set_focus(WefBrowser* browser, bool focus) {
+  if (!browser->browser) {
+    browser->focus = true;
+    return;
+  }
+  (*browser->browser)->GetHost()->SetFocus(focus);
 }
 
 }  // extern "C"

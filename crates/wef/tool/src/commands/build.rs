@@ -94,7 +94,7 @@ fn bundle_macos_app(
 
     add_cef_framework(cef_root, &app_path, release, false)?;
     add_helper(&app_path, wef_version, wef_path, release, false)?;
-    Ok(app_path)
+    Ok(macos_path.join(filename))
 }
 
 pub(crate) fn build(
@@ -132,7 +132,7 @@ pub(crate) fn build(
         command.arg("--release");
     }
 
-    command.status()?;
+    anyhow::ensure!(command.status()?.success(), "failed to build the project");
 
     let target_dir = metadata
         .target_directory
@@ -147,8 +147,7 @@ pub(crate) fn build(
                 bin.as_deref(),
                 example.as_deref(),
             )?;
-            let app_path = bundle_macos_app(&exec_path, &cef_root, release, wef_version, wef_path)?;
-            Ok(app_path)
+            bundle_macos_app(&exec_path, &cef_root, release, wef_version, wef_path)
         }
         "windows" | "linux" => {
             add_cef_framework(&cef_root, target_dir.as_std_path(), release, false)?;

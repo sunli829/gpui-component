@@ -1,12 +1,12 @@
 [package]
-name = "wef-tool"
-version = "0.4.0"
+name = "cargo-wef"
+version = "0.5.0"
 edition = "2024"
 authors = ["sunli <scott_s829@163.com>"]
 license = "Apache-2.0"
 homepage = "https://github.com/longbridge/gpui-component"
 repository = "https://github.com/longbridge/gpui-component"
-description = "wef tool is a command line tool for wef"
+description = "Cargo-wef is a command line tool for wef"
 readme = "../README.md"
 
 [dependencies]

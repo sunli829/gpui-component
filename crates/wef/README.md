@@ -17,8 +17,8 @@
 - [JS Bridge](#js-bridge)
   - [Call Rust functions from JavaScript](#call-rust-functions-from-javascript)
   - [Post Message from Rust to JavaScript](#post-message-from-rust-to-javascript)
-- [Wef Tool](#wef-tool)
-  - [Installation Wef Tool](#installation-wef-tool)
+- [Cargo-wef](#cargo-wef)
+  - [Installation Cargo-wef](#installation-cargo-wef)
   - [Add CEF3 Framework to the MacOS App Bundle](#add-cef3-framework-to-the-macos-app-bundle)
   - [Add Helper applications to the MacOS App Bundle](#add-helper-applications-to-the-macos-app-bundle)
 
@@ -251,16 +251,16 @@ jsBridge.addEventListener((message) => {
 });
 ```
 
-## Wef-tool
+## Cargo Wef
 
-The `wef-tool` is a command-line tool that helps you set up the necessary directory structure for your CEF3 application. It creates the required directories and copies the necessary files from the CEF binary distribution to the appropriate locations.
+The `cargo-wef` is a command-line tool that helps you set up the necessary directory structure for your CEF3 application. It creates the required directories and copies the necessary files from the CEF binary distribution to the appropriate locations.
 
-### Installation Wef Tool
+### Installation Cargo Wef
 
-To install the `wef-tool`, you can use the following command:
+To install the `cargo-wef`, you can use the following command:
 
 ```bash
-cargo install wef-tool
+cargo install cargo-wef
 ```
 
 ### Init Wef
@@ -268,29 +268,38 @@ cargo install wef-tool
 The `init` command used to init and download CEF into your system.
 
 ```bash
-wef-tool init
+cargo wef init
 ```
 
-### Add CEF3 Framework to the MacOS App Bundle
+### Build Wef application
+
+Like cargo build, but it will also copy the CEF3 framework to the target directory.
 
 ```bash
-wef-tool add-framework /path/to/your/app.bundle
+cargo wef build
+```
+
+### Run Wef application
+
+Like cargo run, but it will also copy the CEF3 framework to the target directory.
+
+```bash
+cargo wef run
+```
+
+### Add CEF3 Framework to the application
+
+
+Macos
+
+```bash
+cargo wef add-framework /path/to/your/app.bundle
+```
+
+Windows/Linux
+
+```bash
+cargo wef add-framework /path/to/app
 ```
 
 Or you can use the `--release` flag to add the framework to a release build of your application.
-
-```bash
-wef-tool add-framework --release /path/to/your/app.bundle
-```
-
-### Add Helper applications to the MacOS App Bundle
-
-```bash
-wef-tool add-helper /path/to/your/app.bundle
-```
-
-Or you can use the `--release` flag to add the helper applications to a release build of your application.
-
-```bash
-wef-tool add-helper --release /path/to/your/app.bundle
-```

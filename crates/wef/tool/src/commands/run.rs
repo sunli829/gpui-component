@@ -12,19 +12,6 @@ pub(crate) fn run(
     args: Vec<String>,
 ) -> Result<()> {
     let exec_path = crate::commands::build(package, bin, example, release, wef_version, wef_path)?;
-
-    let mut command = match std::env::consts::OS {
-        "macos" => {
-            let mut command = Command::new("open");
-            command.arg(&exec_path);
-            command.arg("-W");
-            command.arg("--args");
-            command
-        }
-        "windows" | "linux" => Command::new(&exec_path),
-        _ => unreachable!(),
-    };
-
-    command.args(args).status()?;
+    Command::new(&exec_path).args(args).status()?;
     Ok(())
 }

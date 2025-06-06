@@ -40,7 +40,7 @@ impl State {
         let browser = Browser::builder()
             .size(inner_size.width, inner_size.height)
             .device_scale_factor(scale_factor)
-            .url("https://rust-lang.org")
+            .url("https://www.google.com")
             .handler(MyHandler {
                 scale_factor,
                 surface,
@@ -50,6 +50,7 @@ impl State {
                 popup_image: None,
             })
             .build();
+        browser.set_focus(true);
 
         Ok(Self {
             scale_factor,
@@ -174,6 +175,11 @@ impl ApplicationHandler for App {
                 }
                 _ => {}
             },
+            WindowEvent::Focused(focused) => {
+                if let Some(browser) = self.browser() {
+                    browser.set_focus(focused);
+                }
+            }
             _ => (),
         }
     }
