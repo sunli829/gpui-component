@@ -1,4 +1,7 @@
-use std::os::raw::c_void;
+use std::{
+    ffi::{CString, c_char},
+    os::raw::c_void,
+};
 
 use crate::{Error, ffi::*};
 
@@ -11,7 +14,7 @@ use crate::{Error, ffi::*};
 pub struct SandboxContext(*mut c_void);
 
 impl SandboxContext {
-    fn new() -> Result<Self, Error> {
+    pub fn new() -> Result<Self, Error> {
         unsafe {
             let args: Vec<CString> = std::env::args()
                 .filter_map(|arg| CString::new(arg).ok())

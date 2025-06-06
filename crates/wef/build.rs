@@ -36,7 +36,13 @@ fn main() {
     }
     #[cfg(target_os = "macos")]
     {
-        println!("cargo:rustc-link-lib=framework=Foundation");
+        println!("cargo:rustc-link-lib=framework=AppKit");
+        println!(
+            "cargo:rustc-link-search=native={}",
+            cef_link_search_path.join("cef_sandbox.a").display()
+        );
+        println!("cargo:rustc-link-lib=static:+verbatim=cef_sandbox.a");
+        println!("cargo:rustc-link-lib=sandbox");
     }
 
     build_dll_wrapper(&cef_root);

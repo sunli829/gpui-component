@@ -13,7 +13,6 @@ enum Commands {
     /// Download CEF framework
     Init {
         /// Target path
-        #[clap(long)]
         path: Option<PathBuf>,
         /// CEF version
         #[clap(long, default_value = DEFAULT_CEF_VERSION)]

@@ -10,7 +10,7 @@ pub enum CefBuildsPlatform {
     Linux_x64,
 }
 
-pub(crate) const DEFAULT_CEF_VERSION: &str = "136.1.6+g1ac1b14+chromium-136.0.7103.114";
+pub(crate) const DEFAULT_CEF_VERSION: &str = "137.0.10+g7e14fe1+chromium-137.0.7151.69";
 
 impl CefBuildsPlatform {
     fn arch(&self) -> Option<&'static str> {

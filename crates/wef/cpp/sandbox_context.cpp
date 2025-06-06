@@ -4,8 +4,8 @@ extern "C" {
 
 void* wef_sandbox_context_create(char* argv[], int argc) {
   CefScopedSandboxContext* ctx = new CefScopedSandboxContext();
-  if (!sandbox_context.Initialize(argc, argv)) {
-    delete library_loader;
+  if (!ctx->Initialize(argc, argv)) {
+    delete ctx;
     return nullptr;
   }
   return ctx;
@@ -13,7 +13,7 @@ void* wef_sandbox_context_create(char* argv[], int argc) {
 
 void wef_sandbox_context_destroy(void* p) {
   CefScopedSandboxContext* ctx = static_cast<CefScopedSandboxContext*>(p);
-  delete CefScopedSandboxContext;
+  delete ctx;
 }
 
 }  // extern "C"
