@@ -33,6 +33,10 @@ class WefApp : public CefApp, public CefBrowserProcessHandler {
       command_line->AppendSwitch("disable-gpu");
       command_line->AppendSwitch("disable-gpu-compositing");
     }
+
+#ifdef __APPLE__
+    command_line->AppendSwitch("use-mock-keychain");
+#endif
   }
 
   CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler() override {

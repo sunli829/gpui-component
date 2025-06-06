@@ -63,6 +63,7 @@ bool wef_init(const WefSettings* wef_settings) {
 #else
   settings.no_sandbox = true;
 #endif
+
   settings.external_message_pump = true;
 
   if (wef_settings->locale) {
