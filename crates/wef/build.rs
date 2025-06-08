@@ -277,17 +277,21 @@ fn build_wef_sys(cef_root: &Path) {
             "cpp/load_library.cpp",
             "cpp/sandbox_context.cpp",
             "cpp/external_pump_mac.mm",
+            "cpp/shutdown_helper_mac.mm",
         ]);
     }
 
     #[cfg(target_os = "windows")]
     {
-        sources.extend(["cpp/external_pump_win.cpp"]);
+        sources.extend(["cpp/external_pump_win.cpp", "cpp/shutdown_helper_win.cpp"]);
     }
 
     #[cfg(target_os = "linux")]
     {
-        sources.extend(["cpp/external_pump_linux.cpp"]);
+        sources.extend([
+            "cpp/external_pump_linux.cpp",
+            "cpp/shutdown_helper_linux.cpp",
+        ]);
     }
 
     let mut build = Build::new();

@@ -30,7 +30,7 @@ impl Browser {
 
     /// Returns `true` if the browser is created.
     pub fn is_created(&self) -> bool {
-        unsafe { wef_browser_is_created(self.wef_browser) > 0 }
+        unsafe { wef_browser_is_created(self.wef_browser) }
     }
 
     /// Sets the size of the render target.

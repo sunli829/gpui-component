@@ -7,6 +7,7 @@
 #include "include/cef_browser.h"
 #include "include/cef_task.h"
 #include "include/wrapper/cef_closure_task.h"
+#include "shutdown_helper.h"
 #include "wef.h"
 
 WefClient::WefClient(WefBrowser* wef_browser, float device_scale_factor,
@@ -52,4 +53,7 @@ void WefClient::OnLoadEnd(CefRefPtr<CefBrowser> browser,
 void WefClient::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
   message_router_->OnBeforeClose(browser);
   delete wef_browser_;
+  wef_browser_ = nullptr;
+  std::cout << "Browser closed" << std::endl;
+  ShutdownHelper::getSingleton()->browserDestroyed();
 }

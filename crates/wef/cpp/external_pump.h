@@ -6,10 +6,11 @@
 
 class ExternalPump {
  public:
-  static std::unique_ptr<ExternalPump> Create();
-  virtual void OnScheduleMessagePumpWork(int64_t delay_ms) = 0;
   ExternalPump() {}
   virtual ~ExternalPump() {}
+
+  static std::unique_ptr<ExternalPump> Create();
+  virtual void OnScheduleMessagePumpWork(int64_t delay_ms) = 0;
 
  protected:
   void OnScheduleWork(int64_t delay_ms);

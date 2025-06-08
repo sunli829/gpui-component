@@ -12,6 +12,8 @@ class WefApp : public CefApp, public CefBrowserProcessHandler {
 
  private:
   std::unique_ptr<ExternalPump> external_pump_;
+  bool shuting_down_ = false;
+  unsigned int alive_browsers_ = 0;
 
  public:
   WefApp() : external_pump_(ExternalPump::Create()) {}

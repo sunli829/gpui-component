@@ -16,6 +16,7 @@
 #include "include/cef_render_handler.h"
 #include "include/cef_task.h"
 #include "include/wrapper/cef_closure_task.h"
+#include "shutdown_helper.h"
 
 const uint32_t ALL_MOUSE_BUTTONS = EVENTFLAG_LEFT_MOUSE_BUTTON;
 
@@ -58,6 +59,7 @@ extern "C" {
 bool wef_init(const WefSettings* wef_settings) {
   CefSettings settings;
   settings.windowless_rendering_enabled = true;
+
 #ifdef __APPLE__
   settings.no_sandbox = false;
 #else
@@ -98,7 +100,10 @@ bool wef_exec_process(char* argv[], int argc) {
   return CefExecuteProcess(args, app, nullptr) >= 0;
 }
 
-void wef_shutdown() { CefShutdown(); }
+void wef_shutdown() {
+  ShutdownHelper::getSingleton()->shutdown();
+  CefShutdown();
+}
 
 WefBrowser* wef_browser_create(const WefBrowserSettings* settings) {
   CefWindowInfo window_info;
@@ -107,7 +112,7 @@ WefBrowser* wef_browser_create(const WefBrowserSettings* settings) {
   window_info.runtime_style = CEF_RUNTIME_STYLE_ALLOY;
 
   CefBrowserSettings browser_settings;
-  // browser_settings.windowless_frame_rate = settings->frame_rate;
+  browser_settings.windowless_frame_rate = settings->frame_rate;
   browser_settings.background_color = CefColorSetARGB(255, 255, 255, 255);
 
   WefBrowser* wef_browser = new WefBrowser;
@@ -127,6 +132,8 @@ WefBrowser* wef_browser_create(const WefBrowserSettings* settings) {
   wef_browser->browser = std::nullopt;
   wef_browser->cursorX = 0;
   wef_browser->cursorY = 0;
+
+  ShutdownHelper::getSingleton()->browserCreated();
   return wef_browser;
 }
 
@@ -138,8 +145,8 @@ void wef_browser_destroy(WefBrowser* browser) {
   }
 }
 
-int wef_browser_is_created(WefBrowser* browser) {
-  return (bool)browser->browser ? 1 : 0;
+bool wef_browser_is_created(WefBrowser* browser) {
+  return browser->browser.has_value();
 }
 
 void wef_browser_set_size(WefBrowser* browser, int width, int height) {

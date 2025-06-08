@@ -137,7 +137,7 @@ unsafe extern "C" {
 
     pub(crate) unsafe fn wef_browser_destroy(browser: *mut wef_browser_t);
 
-    pub(crate) unsafe fn wef_browser_is_created(browser: *mut wef_browser_t) -> i32;
+    pub(crate) unsafe fn wef_browser_is_created(browser: *mut wef_browser_t) -> bool;
 
     pub(crate) unsafe fn wef_browser_set_size(browser: *mut wef_browser_t, width: i32, height: i32);
 

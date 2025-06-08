@@ -20,8 +20,8 @@ class WefClient : public CefClient,
                   public CefDialogHandler,
                   public CefFindHandler,
                   public CefContextMenuHandler,
-                  public CefJSDialogHandler,
                   public CefRequestHandler,
+                  public CefJSDialogHandler,
                   public CefFocusHandler,
                   public CefPermissionHandler,
                   public CefMessageRouterBrowserSide::Handler {
@@ -334,7 +334,7 @@ class WefClient : public CefClient,
                   JSDialogType dialog_type, const CefString& message_text,
                   const CefString& default_prompt_text,
                   CefRefPtr<CefJSDialogCallback> callback,
-                  bool& suppress_message) {
+                  bool& suppress_message) override {
     auto message_text_str = message_text.ToString();
     auto default_prompt_text_str = default_prompt_text.ToString();
     CefRefPtr<CefJSDialogCallback>* callback_ptr =
@@ -343,6 +343,13 @@ class WefClient : public CefClient,
     return callbacks_.on_js_dialog(
         userdata_, static_cast<int>(dialog_type), message_text_str.c_str(),
         default_prompt_text_str.c_str(), callback_ptr);
+  }
+
+  bool OnBeforeUnloadDialog(CefRefPtr<CefBrowser> browser,
+                            const CefString& message_text, bool is_reload,
+                            CefRefPtr<CefJSDialogCallback> callback) override {
+    callback->Continue(true, "");
+    return true;
   }
 
   /////////////////////////////////////////////////////////////////
