@@ -247,9 +247,6 @@ fn build_dll_wrapper(cef_root: &Path) {
         .cargo_warnings(false)
         .include(cef_root)
         .define("NOMINMAX", None)
-        .define("WINVER", "0x0A00")
-        .define("_WIN32_WINNT", "0x0A00")
-        .define("NTDDI_VERSION", "NTDDI_WIN10_FE")
         .define("WRAPPING_CEF_SHARED", None)
         .files(sources)
         .compile("cef-dll-wrapper");
