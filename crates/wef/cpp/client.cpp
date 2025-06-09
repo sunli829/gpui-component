@@ -54,6 +54,5 @@ void WefClient::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
   message_router_->OnBeforeClose(browser);
   delete wef_browser_;
   wef_browser_ = nullptr;
-  std::cout << "Browser closed" << std::endl;
   ShutdownHelper::getSingleton()->browserDestroyed();
 }

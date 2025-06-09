@@ -25,10 +25,8 @@ class ShutdownHelper {
 
   void shutdown() {
     if (alive_browsers_ > 0) {
-      std::cout << "Waiting for all browsers to close..." << std::endl;
       shuting_down_ = true;
       run();
-      std::cout << "All browsers closed." << std::endl;
     }
   }
 
