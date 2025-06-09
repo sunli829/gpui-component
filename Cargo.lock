@@ -913,15 +913,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "borsh"
-version = "1.5.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ad8646f98db542e39fc66e68a20b2144f6a732636df7c2354e74645faaa433ce"
-dependencies = [
- "cfg_aliases",
-]
-
-[[package]]
 name = "bstr"
 version = "1.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1668,7 +1659,7 @@ dependencies = [
  "rustc-hash 1.1.0",
  "rustybuzz 0.14.1",
  "self_cell",
- "smol_str 0.2.2",
+ "smol_str",
  "swash",
  "sys-locale",
  "ttf-parser 0.21.1",
@@ -2065,10 +2056,6 @@ name = "dpi"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f25c0e292a7ca6d6498557ff1df68f32c99850012b6ea401cf8daf771f22ff53"
-
-[[package]]
-name = "dpi"
-version = "0.1.2"
 
 [[package]]
 name = "drm"
@@ -3986,16 +3973,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "keyboard-types"
-version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fd6e0f18953c66af118a70064505bd3780a226d65b06553b7293fb8933067967"
-dependencies = [
- "bitflags 2.9.1",
- "serde",
-]
-
-[[package]]
 name = "khronos-egl"
 version = "6.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4105,7 +4082,7 @@ checksum = "c0ff37bd590ca25063e35af745c343cb7a0271906fb7b37e4813e8f79f00268d"
 dependencies = [
  "bitflags 2.9.1",
  "libc",
- "redox_syscall",
+ "redox_syscall 0.5.7",
 ]
 
 [[package]]
@@ -4884,20 +4861,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1c10c2894a6fed806ade6027bcd50662746363a9589d3ec9d9bef30a4e4bc166"
 dependencies = [
  "bitflags 2.9.1",
- "block2 0.6.1",
  "dispatch2",
  "objc2 0.6.1",
-]
-
-[[package]]
-name = "objc2-core-graphics"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "989c6c68c13021b5c2d6b71456ebb0f9dc78d752e86a98da7c716f4f9470f5a4"
-dependencies = [
- "bitflags 2.9.1",
- "libc",
- "objc2-core-foundation",
 ]
 
 [[package]]
@@ -4925,17 +4890,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "objc2-core-video"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1989c3e76c7e978cab0ba9e6f4961cd00ed14ca21121444cc26877403bfb6303"
-dependencies = [
- "bitflags 2.9.1",
- "objc2-core-foundation",
- "objc2-core-graphics",
-]
-
-[[package]]
 name = "objc2-encode"
 version = "4.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4949,6 +4903,7 @@ checksum = "0ee638a5da3799329310ad4cfa62fbf045d5f56e3ef5ba4149e7452dcf89d5a8"
 dependencies = [
  "bitflags 2.9.1",
  "block2 0.5.1",
+ "dispatch",
  "libc",
  "objc2 0.5.2",
 ]
@@ -4960,7 +4915,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "900831247d2fe1a09a683278e5384cfb8c80c79fe6b166f9d14bfdde0ea1b03c"
 dependencies = [
  "bitflags 2.9.1",
- "block2 0.6.1",
  "objc2 0.6.1",
  "objc2-core-foundation",
 ]
@@ -5359,7 +5313,7 @@ checksum = "1e401f977ab385c9e4e3ab30627d6f26d00e2c73eef317493c4ec6d468726cf8"
 dependencies = [
  "cfg-if",
  "libc",
- "redox_syscall",
+ "redox_syscall 0.5.7",
  "smallvec",
  "windows-targets 0.52.6",
 ]
@@ -6179,6 +6133,15 @@ checksum = "f6f9e8a4f503e5c8750e4cd3b32a4e090035c46374b305a15c70bad833dca05f"
 dependencies = [
  "bytemuck",
  "font-types",
+]
+
+[[package]]
+name = "redox_syscall"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4722d768eff46b75989dd134e5c353f0d6296e5aaa3132e776cbdb56be7731aa"
+dependencies = [
+ "bitflags 1.3.2",
 ]
 
 [[package]]
@@ -7253,14 +7216,7 @@ name = "smol_str"
 version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dd538fb6910ac1099850255cf94a94df6551fbdd602454387d0adb2d1ca6dead"
-
-[[package]]
-name = "smol_str"
-version = "0.3.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9676b89cd56310a87b93dec47b11af744f34d5fc9f367b829474eec0a891350d"
 dependencies = [
- "borsh",
  "serde",
 ]
 
@@ -7304,7 +7260,7 @@ dependencies = [
  "objc2-foundation 0.2.2",
  "objc2-quartz-core 0.2.2",
  "raw-window-handle",
- "redox_syscall",
+ "redox_syscall 0.5.7",
  "rustix 0.38.44",
  "tiny-xlib",
  "wasm-bindgen",
@@ -9816,201 +9772,50 @@ checksum = "271414315aff87387382ec3d271b52d7ae78726f5d44ac98b4f4030c91880486"
 [[package]]
 name = "winit"
 version = "0.30.11"
-dependencies = [
- "bitflags 2.9.1",
- "cfg_aliases",
- "cursor-icon",
- "dpi 0.1.2",
- "libc",
- "raw-window-handle",
- "rustix 1.0.7",
- "smol_str 0.3.2",
- "tracing",
- "winit-android",
- "winit-appkit",
- "winit-common",
- "winit-core",
- "winit-orbital",
- "winit-uikit",
- "winit-wayland",
- "winit-web",
- "winit-win32",
- "winit-x11",
-]
-
-[[package]]
-name = "winit-android"
-version = "0.30.11"
-dependencies = [
- "android-activity",
- "bitflags 2.9.1",
- "dpi 0.1.2",
- "ndk",
- "raw-window-handle",
- "smol_str 0.3.2",
- "tracing",
- "winit-core",
-]
-
-[[package]]
-name = "winit-appkit"
-version = "0.30.11"
-dependencies = [
- "bitflags 2.9.1",
- "block2 0.6.1",
- "dispatch2",
- "dpi 0.1.2",
- "objc2 0.6.1",
- "objc2-app-kit 0.3.1",
- "objc2-core-foundation",
- "objc2-core-graphics",
- "objc2-core-video",
- "objc2-foundation 0.3.1",
- "raw-window-handle",
- "smol_str 0.3.2",
- "tracing",
- "winit-common",
- "winit-core",
-]
-
-[[package]]
-name = "winit-common"
-version = "0.30.11"
-dependencies = [
- "memmap2",
- "objc2 0.6.1",
- "objc2-core-foundation",
- "smol_str 0.3.2",
- "tracing",
- "winit-core",
- "x11-dl",
- "xkbcommon-dl",
-]
-
-[[package]]
-name = "winit-core"
-version = "0.30.11"
-dependencies = [
- "bitflags 2.9.1",
- "cursor-icon",
- "dpi 0.1.2",
- "keyboard-types",
- "raw-window-handle",
- "smol_str 0.3.2",
- "web-time",
-]
-
-[[package]]
-name = "winit-orbital"
-version = "0.30.11"
-dependencies = [
- "bitflags 2.9.1",
- "dpi 0.1.2",
- "orbclient",
- "raw-window-handle",
- "redox_syscall",
- "smol_str 0.3.2",
- "tracing",
- "winit-core",
-]
-
-[[package]]
-name = "winit-uikit"
-version = "0.30.11"
-dependencies = [
- "bitflags 2.9.1",
- "block2 0.6.1",
- "dispatch2",
- "dpi 0.1.2",
- "objc2 0.6.1",
- "objc2-core-foundation",
- "objc2-foundation 0.3.1",
- "objc2-ui-kit 0.3.1",
- "raw-window-handle",
- "smol_str 0.3.2",
- "tracing",
- "winit-common",
- "winit-core",
-]
-
-[[package]]
-name = "winit-wayland"
-version = "0.30.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a4409c10174df8779dc29a4788cac85ed84024ccbc1743b776b21a520ee1aaf4"
 dependencies = [
  "ahash 0.8.11",
+ "android-activity",
+ "atomic-waker",
  "bitflags 2.9.1",
+ "block2 0.5.1",
+ "bytemuck",
  "calloop",
+ "cfg_aliases",
+ "concurrent-queue",
+ "core-foundation 0.9.4",
+ "core-graphics 0.23.2",
  "cursor-icon",
- "dpi 0.1.2",
+ "dpi",
+ "js-sys",
  "libc",
  "memmap2",
+ "ndk",
+ "objc2 0.5.2",
+ "objc2-app-kit 0.2.2",
+ "objc2-foundation 0.2.2",
+ "objc2-ui-kit 0.2.2",
+ "orbclient",
+ "percent-encoding",
+ "pin-project",
  "raw-window-handle",
- "rustix 1.0.7",
+ "redox_syscall 0.4.1",
+ "rustix 0.38.44",
  "sctk-adwaita",
  "smithay-client-toolkit",
- "smol_str 0.3.2",
+ "smol_str",
  "tracing",
+ "unicode-segmentation",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
  "wayland-backend",
  "wayland-client",
  "wayland-protocols 0.32.8",
  "wayland-protocols-plasma 0.3.8",
- "winit-common",
- "winit-core",
-]
-
-[[package]]
-name = "winit-web"
-version = "0.30.11"
-dependencies = [
- "atomic-waker",
- "bitflags 2.9.1",
- "concurrent-queue",
- "cursor-icon",
- "dpi 0.1.2",
- "js-sys",
- "pin-project",
- "raw-window-handle",
- "smol_str 0.3.2",
- "tracing",
- "wasm-bindgen",
- "wasm-bindgen-futures",
  "web-sys",
  "web-time",
- "winit-core",
-]
-
-[[package]]
-name = "winit-win32"
-version = "0.30.11"
-dependencies = [
- "bitflags 2.9.1",
- "cursor-icon",
- "dpi 0.1.2",
- "raw-window-handle",
- "smol_str 0.3.2",
- "tracing",
- "unicode-segmentation",
- "windows-sys 0.59.0",
- "winit-core",
-]
-
-[[package]]
-name = "winit-x11"
-version = "0.30.11"
-dependencies = [
- "bitflags 2.9.1",
- "bytemuck",
- "calloop",
- "cursor-icon",
- "dpi 0.1.2",
- "libc",
- "percent-encoding",
- "raw-window-handle",
- "rustix 1.0.7",
- "smol_str 0.3.2",
- "tracing",
- "winit-common",
- "winit-core",
+ "windows-sys 0.52.0",
  "x11-dl",
  "x11rb",
  "xkbcommon-dl",
@@ -10087,7 +9892,7 @@ dependencies = [
  "block2 0.5.1",
  "cookie",
  "crossbeam-channel",
- "dpi 0.1.1",
+ "dpi",
  "dunce",
  "gdkx11",
  "gtk",
