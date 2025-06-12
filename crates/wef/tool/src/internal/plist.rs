@@ -83,7 +83,7 @@ pub(crate) struct InfoPlist {
     pub(crate) bundle_version: Option<String>,
     pub(crate) bundle_short_version: Option<String>,
     #[serde(default)]
-    pub(crate) icon: Vec<String>,
+    pub(crate) icons: Vec<String>,
     pub(crate) category: Option<String>,
     pub(crate) osx_minimum_system_version: Option<String>,
     #[serde(default)]
@@ -100,7 +100,7 @@ impl InfoPlist {
             region: None,
             bundle_version: None,
             bundle_short_version: None,
-            icon: vec![],
+            icons: vec![],
             category: None,
             osx_minimum_system_version: None,
             osx_url_schemes: vec![],

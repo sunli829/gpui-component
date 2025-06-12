@@ -1,5 +1,7 @@
 use std::{
+    ffi::OsStr,
     fs::File,
+    io::BufWriter,
     path::{Path, PathBuf},
     process::Command,
 };
@@ -7,6 +9,8 @@ use std::{
 use anyhow::{Context, Result};
 use askama::Template;
 use cargo_metadata::{Metadata, MetadataCommand};
+use icns::IconFamily;
+use image::GenericImageView;
 
 use crate::internal::{InfoPlist, add_cef_framework, add_helper};
 
@@ -159,6 +163,101 @@ fn create_plist(binary_info: &BinaryInfo, bundle_type: Option<&str>) -> Result<I
     Ok(plist)
 }
 
+fn create_icns_file(resources_dir: &Path, bundle_name: &str, icons: &[String]) -> Result<()> {
+    if icons.is_empty() {
+        return Ok(());
+    }
+
+    for icon_path in icons {
+        let icon_path = Path::new(icon_path);
+        if icon_path.extension() == Some(OsStr::new("icns")) {
+            std::fs::create_dir(resources_dir)?;
+            std::fs::copy(
+                icon_path,
+                resources_dir.join(icon_path.file_name().unwrap()),
+            )?;
+            return Ok(());
+        }
+    }
+
+    let mut family = IconFamily::new();
+
+    fn make_icns_image(img: image::DynamicImage) -> Result<icns::Image> {
+        let pixel_format = match img.color() {
+            image::ColorType::Rgba8 => icns::PixelFormat::RGBA,
+            image::ColorType::Rgb8 => icns::PixelFormat::RGB,
+            image::ColorType::La8 => icns::PixelFormat::GrayAlpha,
+            image::ColorType::L8 => icns::PixelFormat::Gray,
+            _ => {
+                anyhow::bail!("Unsupported image color type: {:?}", img.color());
+            }
+        };
+        Ok(icns::Image::from_data(
+            pixel_format,
+            img.width(),
+            img.height(),
+            img.into_bytes(),
+        )?)
+    }
+
+    fn add_icon_to_family(
+        icon: image::DynamicImage,
+        density: u32,
+        family: &mut icns::IconFamily,
+    ) -> Result<()> {
+        // Try to add this image to the icon family.  Ignore images whose sizes
+        // don't map to any ICNS icon type; print warnings and skip images that
+        // fail to encode.
+        match icns::IconType::from_pixel_size_and_density(icon.width(), icon.height(), density) {
+            Some(icon_type) => {
+                if !family.has_icon_with_type(icon_type) {
+                    let icon = make_icns_image(icon)?;
+                    family.add_icon_with_type(&icon, icon_type)?;
+                }
+                Ok(())
+            }
+            None => anyhow::bail!("No matching IconType"),
+        }
+    }
+
+    fn is_retina(path: &Path) -> bool {
+        path.file_stem()
+            .and_then(OsStr::to_str)
+            .map(|stem| stem.ends_with("@2x"))
+            .unwrap_or(false)
+    }
+
+    let mut images_to_resize: Vec<(image::DynamicImage, u32, u32)> = vec![];
+    for icon_path in icons {
+        let icon_path = Path::new(icon_path);
+        let icon = image::open(icon_path)?;
+        let density = if is_retina(icon_path) { 2 } else { 1 };
+        let (w, h) = icon.dimensions();
+        let orig_size = w.min(h);
+        let next_size_down = 2f32.powf((orig_size as f32).log2().floor()) as u32;
+        if orig_size > next_size_down {
+            images_to_resize.push((icon, next_size_down, density));
+        } else {
+            add_icon_to_family(icon, density, &mut family)?;
+        }
+    }
+
+    for (icon, next_size_down, density) in images_to_resize {
+        let icon = icon.resize_exact(next_size_down, next_size_down, image::imageops::Lanczos3);
+        add_icon_to_family(icon, density, &mut family)?;
+    }
+
+    if !family.is_empty() {
+        std::fs::create_dir_all(resources_dir)?;
+        let icns_path = resources_dir.join(bundle_name).with_extension("icns");
+        let icns_file = BufWriter::new(File::create(&icns_path)?);
+        family.write(icns_file)?;
+        return Ok(());
+    }
+
+    anyhow::bail!("No usable icon files found.")
+}
+
 fn bundle_macos_app(
     exec_path: &Path,
     binary_info: BinaryInfo,
@@ -181,6 +280,9 @@ fn bundle_macos_app(
 
     let plist_path = app_path.join("Contents").join("Info.plist");
     let plist = create_plist(&binary_info, bundle_type)?;
+
+    let resources_path = app_path.join("Contents").join("Resources");
+    create_icns_file(&resources_path, &plist.name, &plist.icons).context("create ICNS file")?;
 
     plist
         .write_into(&mut File::create(&plist_path)?)
