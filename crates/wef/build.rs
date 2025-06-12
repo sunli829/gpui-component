@@ -37,7 +37,15 @@ fn main() {
     #[cfg(target_os = "macos")]
     {
         println!("cargo:rustc-link-lib=framework=AppKit");
-        println!("cargo:rustc-link-lib=static:+verbatim=cef_sandbox.a");
+
+        let outdir = PathBuf::from(std::env::var("OUT_DIR").unwrap());
+        std::fs::copy(
+            cef_link_search_path.join("cef_sandbox.a"),
+            outdir.join("libcef_sandbox.a"),
+        )
+        .expect("copy cef_sandbox.a");
+        println!("cargo:rustc-link-search=native={}", outdir.display());
+        println!("cargo:rustc-link-lib=static=cef_sandbox");
     }
 
     build_dll_wrapper(&cef_root);
