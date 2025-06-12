@@ -23,6 +23,7 @@ class ShutdownHelperLinux : public ShutdownHelper {
 
  private:
   bool should_quit_ = false;
+  GMainContext* context_ = g_main_context_default();
 };
 
 std::unique_ptr<ShutdownHelper>& ShutdownHelper::getSingleton() {
