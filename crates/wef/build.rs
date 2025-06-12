@@ -38,6 +38,12 @@ fn main() {
     {
         println!("cargo:rustc-link-lib=framework=AppKit");
 
+        // FIXME: Failed to link to `cef_sandbox.a` on macOS/
+        //
+        // Workaround: copy `cef_sandbox.a` to the output directory and link it as
+        // `libcef_sandbox.a`
+        //
+        // https://github.com/rust-lang/rust/issues/132264
         let outdir = PathBuf::from(std::env::var("OUT_DIR").unwrap());
         std::fs::copy(
             cef_link_search_path.join("cef_sandbox.a"),
