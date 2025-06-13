@@ -11,3 +11,5 @@ pub mod events;
 
 pub use webview::WebView;
 pub use wef;
+
+rust_i18n::i18n!("locales", fallback = "en");

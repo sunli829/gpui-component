@@ -1,5 +1,6 @@
 use gpui::{App, Entity, Window, impl_actions};
 use gpui_component::popup_menu::PopupMenu;
+use rust_i18n::t;
 use schemars::JsonSchema;
 use serde::Deserialize;
 use wef::{ContextMenuParams, Frame, LogicalUnit, Point};
@@ -40,51 +41,54 @@ pub(crate) fn build_context_menu(
 
     PopupMenu::build(window, cx, |mut popmenu, _window, cx| {
         if params.type_.contains(TypeFlags::SELECTION) {
-            popmenu = popmenu.menu("Copy", Box::new(ContextMenuAction::Copy));
+            popmenu = popmenu.menu(
+                t!("WebView.ContextMenu.Copy"),
+                Box::new(ContextMenuAction::Copy),
+            );
         }
 
         if params.type_.contains(TypeFlags::LINK) {
             popmenu = popmenu.menu(
-                "Copy link address",
+                t!("WebView.ContextMenu.CopyLinkAddress"),
                 Box::new(ContextMenuAction::CopyLinkAddress),
             );
         } else if params.type_.contains(TypeFlags::EDITABLE) {
             popmenu = popmenu
                 .menu_with_disabled(
-                    "Undo",
+                    t!("WebView.ContextMenu.Undo"),
                     Box::new(ContextMenuAction::Undo),
                     !params.edit_state_flags.contains(EditStateFlags::CAN_UNDO),
                 )
                 .menu_with_disabled(
-                    "Redo",
+                    t!("WebView.ContextMenu.Redo"),
                     Box::new(ContextMenuAction::Redo),
                     !params.edit_state_flags.contains(EditStateFlags::CAN_REDO),
                 )
                 .separator()
                 .menu_with_disabled(
-                    "Cut",
+                    t!("WebView.ContextMenu.Cut"),
                     Box::new(ContextMenuAction::Cut),
                     !params.edit_state_flags.contains(EditStateFlags::CAN_CUT),
                 )
                 .menu_with_disabled(
-                    "Copy",
+                    t!("WebView.ContextMenu.Copy"),
                     Box::new(ContextMenuAction::Copy),
                     !params.edit_state_flags.contains(EditStateFlags::CAN_COPY),
                 )
                 .menu_with_disabled(
-                    "Paste",
+                    t!("WebView.ContextMenu.Paste"),
                     Box::new(ContextMenuAction::Paste),
                     !params.edit_state_flags.contains(EditStateFlags::CAN_PASTE),
                 )
                 .menu_with_disabled(
-                    "Parse as plain text",
+                    t!("WebView.ContextMenu.ParseAsPlainText"),
                     Box::new(ContextMenuAction::ParseAsPlainText),
                     !params
                         .edit_state_flags
                         .contains(EditStateFlags::CAN_EDIT_RICHLY),
                 )
                 .menu_with_disabled(
-                    "Select all",
+                    t!("WebView.ContextMenu.SelectAll"),
                     Box::new(ContextMenuAction::SelectAll),
                     !params
                         .edit_state_flags
@@ -93,16 +97,19 @@ pub(crate) fn build_context_menu(
         } else if params.type_.contains(TypeFlags::PAGE) {
             popmenu = popmenu
                 .menu_with_disabled(
-                    "Back",
+                    t!("WebView.ContextMenu.Back"),
                     Box::new(ContextMenuAction::GoBack),
                     !webview.browser().can_back(),
                 )
                 .menu_with_disabled(
-                    "Forward",
+                    t!("WebView.ContextMenu.Forward"),
                     Box::new(ContextMenuAction::GoForward),
                     !webview.browser().can_forward(),
                 )
-                .menu("Reload", Box::new(ContextMenuAction::Reload))
+                .menu(
+                    t!("WebView.ContextMenu.Reload"),
+                    Box::new(ContextMenuAction::Reload),
+                )
         }
 
         cx.notify();
