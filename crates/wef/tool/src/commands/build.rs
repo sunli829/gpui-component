@@ -24,6 +24,7 @@ enum BinaryKind {
 struct BinaryInfo {
     metadata: serde_json::Value,
     package_name: String,
+    package_path: PathBuf,
     target_name: String,
     kind: BinaryKind,
     version: String,
@@ -104,6 +105,12 @@ fn execute_path(
         BinaryInfo {
             metadata: package.metadata.clone(),
             package_name: package.name.to_string(),
+            package_path: package
+                .manifest_path
+                .parent()
+                .unwrap()
+                .to_path_buf()
+                .into_std_path_buf(),
             target_name: target.name.clone(),
             kind: binary_kind,
             version: package.version.to_string(),
@@ -163,17 +170,22 @@ fn create_plist(binary_info: &BinaryInfo, bundle_type: Option<&str>) -> Result<I
     Ok(plist)
 }
 
-fn create_icns_file(resources_dir: &Path, bundle_name: &str, icons: &[String]) -> Result<()> {
+fn create_icns_file(
+    package_path: &Path,
+    resources_dir: &Path,
+    bundle_name: &str,
+    icons: &[String],
+) -> Result<()> {
     if icons.is_empty() {
         return Ok(());
     }
 
     for icon_path in icons {
-        let icon_path = Path::new(icon_path);
+        let icon_path = package_path.join(icon_path);
         if icon_path.extension() == Some(OsStr::new("icns")) {
             std::fs::create_dir(resources_dir)?;
             std::fs::copy(
-                icon_path,
+                &icon_path,
                 resources_dir.join(icon_path.file_name().unwrap()),
             )?;
             return Ok(());
@@ -229,9 +241,9 @@ fn create_icns_file(resources_dir: &Path, bundle_name: &str, icons: &[String]) -
 
     let mut images_to_resize: Vec<(image::DynamicImage, u32, u32)> = vec![];
     for icon_path in icons {
-        let icon_path = Path::new(icon_path);
-        let icon = image::open(icon_path)?;
-        let density = if is_retina(icon_path) { 2 } else { 1 };
+        let icon_path = package_path.join(icon_path);
+        let icon = image::open(&icon_path)?;
+        let density = if is_retina(&icon_path) { 2 } else { 1 };
         let (w, h) = icon.dimensions();
         let orig_size = w.min(h);
         let next_size_down = 2f32.powf((orig_size as f32).log2().floor()) as u32;
@@ -282,7 +294,13 @@ fn bundle_macos_app(
     let plist = create_plist(&binary_info, bundle_type)?;
 
     let resources_path = app_path.join("Contents").join("Resources");
-    create_icns_file(&resources_path, &plist.name, &plist.icons).context("create ICNS file")?;
+    create_icns_file(
+        &binary_info.package_path,
+        &resources_path,
+        &plist.name,
+        &plist.icons,
+    )
+    .context("create ICNS file")?;
 
     plist
         .write_into(&mut File::create(&plist_path)?)
