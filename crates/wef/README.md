@@ -19,8 +19,10 @@
   - [Post Message from Rust to JavaScript](#post-message-from-rust-to-javascript)
 - [Cargo-wef](#cargo-wef)
   - [Installation Cargo-wef](#installation-cargo-wef)
-  - [Add CEF3 Framework to the MacOS App Bundle](#add-cef3-framework-to-the-macos-app-bundle)
-  - [Add Helper applications to the MacOS App Bundle](#add-helper-applications-to-the-macos-app-bundle)
+  - [Build Wef application](#build-wef-application)
+    - [MacOS Bundle Settings](#macos-bundle-settings)
+  - [Run Wef application](#run-wef-application)
+  - [Add CEF3 Framework to the application](#add-cef3-framework-to-the-application)
 
 ## Introduction
 
@@ -255,6 +257,8 @@ jsBridge.addEventListener((message) => {
 
 The `cargo-wef` is a command-line tool that helps you set up the necessary directory structure for your CEF3 application. It creates the required directories and copies the necessary files from the CEF binary distribution to the appropriate locations.
 
+We strongly recommend using `cargo-wef` to build/run your CEF3 application, as it simplifies the process of setting up and building your application.
+
 ### Installation Cargo Wef
 
 To install the `cargo-wef`, you can use the following command:
@@ -265,10 +269,10 @@ cargo install cargo-wef
 
 ### Init Wef
 
-The `init` command used to init and download CEF into your system.
+The `init` command used to init and download CEF into your system, default download path is `~/.cef`, you can change it by passing the path to the command.
 
 ```bash
-cargo wef init
+cargo wef init [/path/to/cef]
 ```
 
 ### Build Wef application
@@ -279,6 +283,12 @@ Like cargo build, but it will also copy the CEF3 framework to the target directo
 cargo wef build
 ```
 
+On MacOS, this command will also create an application bundle with the CEF3 framework inside.
+On Windows and Linux, it will copy the CEF3 framework to the target directory.
+
+```bash
+If on MacOS, this command also create application bundle with the CEF3 framework inside.
+
 ### Run Wef application
 
 Like cargo run, but it will also copy the CEF3 framework to the target directory.
@@ -287,10 +297,50 @@ Like cargo run, but it will also copy the CEF3 framework to the target directory
 cargo wef run
 ```
 
+#### MacOS Bundle Settings
+
+You can specify the application bundle settings in your `Cargo.toml` file under the `package.metadata.bundle` section, otherwise it will use the default settings.
+
+```toml
+[package.metadata.bundle]
+name = "my-wef-app"
+identifier = "my.wef.app"
+```
+
+Settings for a specific binary:
+
+```toml
+[package.metadata.bundle.bin.example1]
+name = "my-wef-app"
+identifier = "my.wef.app"
+```
+
+Settings for a specific example:
+
+```toml
+[package.metadata.bundle.example.app1]
+name = "my-wef-app"
+identifier = "my.wef.app"
+```
+
+| name                   | type     | optional | description                                                                                                              |
+|------------------------|----------|----------|--------------------------------------------------------------------------------------------------------------------------|
+| name                   | String   | No       | Bundle name                                                                                                              |
+| identifier             | String   | No       | Bundle identifier                                                                                                        |
+| display_name           | String   | Yes      | Display name, If is `None` then use `name`                                                                               |
+| executable_name        | String   | Yes      | Executable name, If is `None` then use `name`                                                                            |
+| region                 | String   | Yes      | Region, If is `None` then use `en`                                                                                       |
+| bundle_version         | String   | Yes      | Bundle version, If is `None` then use empty string                                                                       |
+| bundle_short_version   | String   | Yes      | Bundle short version, If is `None` then use crate version                                                                |
+| category               | String   | Yes      | Category                                                                                                                 |
+| minimum_system_version | String   | Yes      | Minimum system version                                                                                                   |
+| icons                  | [String] | Yes      | Array of icon paths, base path is the package directory(same as `Cargo.toml`)                                            |
+| url_schemes            | [String] | Yes      | Array of URL schemes                                                                                                     |
+| agent_app              | bool     | Yes      | If is `true` then indicating whether the app is an agent app that runs in the background and doesn’t appear in the Dock. |
+
 ### Add CEF3 Framework to the application
 
-
-Macos
+MacOS
 
 ```bash
 cargo wef add-framework /path/to/your/app.bundle
