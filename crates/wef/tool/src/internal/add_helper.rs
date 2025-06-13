@@ -243,6 +243,7 @@ fn create_helper_app(
             .map(|executable_name| kind.bundle_name(executable_name))
             .unwrap_or_else(|| kind.bundle_name(&bundle_info.bundle_name)),
     );
+    plist.agent_app = true;
 
     plist
         .write_into(&mut File::create(&plist_path)?)

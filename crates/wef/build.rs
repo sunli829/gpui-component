@@ -37,6 +37,7 @@ fn main() {
     #[cfg(target_os = "macos")]
     {
         println!("cargo:rustc-link-lib=framework=AppKit");
+        println!("cargo:rustc-link-lib=sandbox");
 
         // FIXME: Failed to link to `cef_sandbox.a` on macOS/
         //

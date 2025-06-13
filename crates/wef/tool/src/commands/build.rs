@@ -173,21 +173,22 @@ fn create_plist(binary_info: &BinaryInfo, bundle_type: Option<&str>) -> Result<I
 fn create_icns_file(
     package_path: &Path,
     resources_dir: &Path,
-    bundle_name: &str,
-    icons: &[String],
+    plist: &mut InfoPlist,
 ) -> Result<()> {
-    if icons.is_empty() {
+    if plist.icons.is_empty() {
         return Ok(());
     }
 
-    for icon_path in icons {
+    for icon_path in &plist.icons {
         let icon_path = package_path.join(icon_path);
         if icon_path.extension() == Some(OsStr::new("icns")) {
             std::fs::create_dir(resources_dir)?;
-            std::fs::copy(
-                &icon_path,
-                resources_dir.join(icon_path.file_name().unwrap()),
-            )?;
+
+            let target_path = resources_dir.join(&plist.name).with_extension("icns");
+            std::fs::copy(&icon_path, &target_path).with_context(|| {
+                format!("copy {} to {}", icon_path.display(), target_path.display())
+            })?;
+            plist.icon = Some(format!("{}.icns", plist.name));
             return Ok(());
         }
     }
@@ -240,9 +241,10 @@ fn create_icns_file(
     }
 
     let mut images_to_resize: Vec<(image::DynamicImage, u32, u32)> = vec![];
-    for icon_path in icons {
+    for icon_path in &plist.icons {
         let icon_path = package_path.join(icon_path);
-        let icon = image::open(&icon_path)?;
+        let icon = image::open(&icon_path)
+            .with_context(|| format!("load image {}", icon_path.display()))?;
         let density = if is_retina(&icon_path) { 2 } else { 1 };
         let (w, h) = icon.dimensions();
         let orig_size = w.min(h);
@@ -261,9 +263,12 @@ fn create_icns_file(
 
     if !family.is_empty() {
         std::fs::create_dir_all(resources_dir)?;
-        let icns_path = resources_dir.join(bundle_name).with_extension("icns");
+        let icns_path = resources_dir.join(&plist.name).with_extension("icns");
         let icns_file = BufWriter::new(File::create(&icns_path)?);
-        family.write(icns_file)?;
+        family
+            .write(icns_file)
+            .with_context(|| format!("write icns file {}", icns_path.display()))?;
+        plist.icon = Some(format!("{}.icns", plist.name));
         return Ok(());
     }
 
@@ -291,22 +296,20 @@ fn bundle_macos_app(
     std::fs::copy(exec_path, macos_path.join(filename)).context("copy binary to app bundle")?;
 
     let plist_path = app_path.join("Contents").join("Info.plist");
-    let plist = create_plist(&binary_info, bundle_type)?;
+    let mut plist = create_plist(&binary_info, bundle_type)?;
 
+    println!("Create ICNS file...");
     let resources_path = app_path.join("Contents").join("Resources");
-    create_icns_file(
-        &binary_info.package_path,
-        &resources_path,
-        &plist.name,
-        &plist.icons,
-    )
-    .context("create ICNS file")?;
+    create_icns_file(&binary_info.package_path, &resources_path, &mut plist)
+        .context("create ICNS file")?;
 
     plist
         .write_into(&mut File::create(&plist_path)?)
         .with_context(|| format!("create file at {}", plist_path.display()))?;
 
+    println!("Add CEF Framework...");
     add_cef_framework(cef_root, &app_path, release, false)?;
+    println!("Add Helper Processes...");
     add_helper(&app_path, wef_version, wef_path, release, false)?;
     Ok(macos_path.join(filename))
 }

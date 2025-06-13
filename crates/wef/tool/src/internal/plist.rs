@@ -48,11 +48,19 @@ use serde::Deserialize;
 ///   <key>LSApplicationCategoryType</key>
 ///   <string>{{ category | e }}</string>
 ///   {% endif %}
-///   {% if let Some(osx_minimum_system_version) = osx_minimum_system_version %}
-///   <key>LSMinimumSystemVersion</key>
-///   <string>{{ osx_minimum_system_version | e }}</string>
+///   {% if let Some(icon) = icon %}
+///   <key>CFBundleIconFile</key>
+///   <string>{{ icon | e }}</string>
 ///   {% endif %}
-///   {% if osx_url_schemes.len() > 0 %}
+///   {% if agent_app %}
+///   <key>LSUIElement</key>
+///   <string>1</string>
+///   {% endif %}
+///   {% if let Some(minimum_system_version) = minimum_system_version %}
+///   <key>LSMinimumSystemVersion</key>
+///   <string>{{ minimum_system_version | e }}</string>
+///   {% endif %}
+///   {% if url_schemes.len() > 0 %}
 ///   <key>CFBundleURLTypes</key>
 ///   <array>
 ///     <dict>
@@ -62,7 +70,7 @@ use serde::Deserialize;
 ///        <string>Viewer</string>
 ///        <key>CFBundleURLSchemes</key>
 ///        <array>
-///        {% for scheme in osx_url_schemes %}
+///        {% for scheme in url_schemes %}
 ///          <string>{{ scheme | e }}</string>
 ///        {% endfor %}
 ///        </array>
@@ -84,10 +92,13 @@ pub(crate) struct InfoPlist {
     pub(crate) bundle_short_version: Option<String>,
     #[serde(default)]
     pub(crate) icons: Vec<String>,
+    pub(crate) icon: Option<String>,
     pub(crate) category: Option<String>,
-    pub(crate) osx_minimum_system_version: Option<String>,
+    pub(crate) minimum_system_version: Option<String>,
     #[serde(default)]
-    pub(crate) osx_url_schemes: Vec<String>,
+    pub(crate) url_schemes: Vec<String>,
+    #[serde(default)]
+    pub(crate) agent_app: bool,
 }
 
 impl InfoPlist {
@@ -101,9 +112,11 @@ impl InfoPlist {
             bundle_version: None,
             bundle_short_version: None,
             icons: vec![],
+            icon: None,
             category: None,
-            osx_minimum_system_version: None,
-            osx_url_schemes: vec![],
+            minimum_system_version: None,
+            url_schemes: vec![],
+            agent_app: false,
         }
     }
 }

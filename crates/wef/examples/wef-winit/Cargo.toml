@@ -17,3 +17,4 @@ softbuffer = "0.4.6"
 name = "wef-winit"
 identifier = "io.github.longbridge.wef.examples.winit"
 category = "Utility"
+icons = ["icons/icon32x32.png", "icons/icon128x128.png"]
