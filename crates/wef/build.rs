@@ -32,6 +32,7 @@ fn main() {
     }
     #[cfg(target_os = "linux")]
     {
+        println!("cargo:rustc-link-arg=-Wl,-rpath,.");
         println!("cargo:rustc-link-lib=cef");
     }
     #[cfg(target_os = "macos")]
