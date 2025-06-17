@@ -28,7 +28,6 @@ where
             cache_path: to_cstr_ptr_opt(settings.cache_path.as_deref()),
             root_cache_path: to_cstr_ptr_opt(settings.root_cache_path.as_deref()),
             browser_subprocess_path: to_cstr_ptr_opt(settings.browser_subprocess_path.as_deref()),
-            external_message_pump: settings.external_message_pump,
             callbacks,
             userdata: handler as *mut c_void,
             destroy_userdata: destroy_handler::<T>,

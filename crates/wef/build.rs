@@ -270,10 +270,19 @@ fn build_wef_sys(cef_root: &Path) {
         "cpp/cursor.cpp",
         "cpp/js_dialog.cpp",
         "cpp/query.cpp",
+        "cpp/external_pump.cpp",
     ];
 
-    if cfg!(target_os = "macos") {
-        sources.extend(["cpp/load_library.cpp", "cpp/sandbox_context.cpp"]);
+    if cfg!(target_os = "windows") {
+        sources.extend(["cpp/external_pump_win.cpp"]);
+    } else if cfg!(target_os = "macos") {
+        sources.extend([
+            "cpp/load_library.cpp",
+            "cpp/sandbox_context.cpp",
+            "cpp/external_pump_mac.mm",
+        ]);
+    } else if cfg!(target_os = "linux") {
+        sources.extend(["cpp/external_pump_linux.cpp"]);
     }
 
     let mut build = Build::new();

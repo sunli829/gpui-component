@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::{rc::Rc, time::Duration};
 
 use image::{GenericImage, RgbaImage, buffer::ConvertBuffer};
 use softbuffer::Surface;
@@ -336,20 +336,22 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     let event_loop = EventLoop::<UserEvent>::with_user_event().build()?;
     let event_loop_proxy = event_loop.create_proxy();
 
-    std::thread::spawn({
-        let event_loop_proxy = event_loop_proxy.clone();
-        move || {
-            loop {
-                std::thread::sleep(std::time::Duration::from_millis(1000 / 60));
-                if event_loop_proxy
-                    .send_event(UserEvent::WefMesssagePump)
-                    .is_err()
-                {
-                    break;
+    if cfg!(target_os = "linux") {
+        std::thread::spawn({
+            let event_loop_proxy = event_loop_proxy.clone();
+            move || {
+                loop {
+                    std::thread::sleep(Duration::from_millis(1000 / 60));
+                    if event_loop_proxy
+                        .send_event(UserEvent::WefMesssagePump)
+                        .is_err()
+                    {
+                        break;
+                    }
                 }
             }
-        }
-    });
+        });
+    }
 
     let mut app = App::new(event_loop_proxy);
     event_loop.run_app(&mut app)?;

@@ -97,23 +97,24 @@ impl Render for Main {
 
 fn run() {
     Application::new().run(|cx: &mut App| {
-        cx.spawn(async move |cx| {
-            let (tx, rx) = flume::unbounded();
+        if cfg!(target_os = "linux") {
+            cx.spawn(async move |cx| {
+                let (tx, rx) = flume::unbounded();
 
-            cx.background_spawn(async move {
-                let mut timer = Timer::interval(Duration::from_millis(1000 / 60));
-                while timer.next().await.is_some() {
-                    // println!("tick {:?}", std::time::Instant::now());
-                    _ = tx.send_async(()).await;
+                cx.background_spawn(async move {
+                    let mut timer = Timer::interval(Duration::from_millis(1000 / 60));
+                    while timer.next().await.is_some() {
+                        _ = tx.send_async(()).await;
+                    }
+                })
+                .detach();
+
+                while rx.recv_async().await.is_ok() {
+                    wef::do_message_work();
                 }
             })
             .detach();
-
-            while rx.recv_async().await.is_ok() {
-                wef::do_message_work();
-            }
-        })
-        .detach();
+        }
 
         gpui_component::init(cx);
 

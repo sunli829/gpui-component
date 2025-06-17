@@ -41,6 +41,8 @@ class BrowserCallbacksTarget {
         destroy_userdata_(destroy_userdata) {}
 
   BrowserCallbacksTarget(const BrowserCallbacksTarget& other) = delete;
+  BrowserCallbacksTarget& operator=(const BrowserCallbacksTarget& other) =
+      delete;
 
   BrowserCallbacksTarget(BrowserCallbacksTarget&& other)
       : disable_(other.disable_),
@@ -89,6 +91,7 @@ struct BrowserSharedState {
         callbacks_target(std::move(other)) {}
 
   BrowserSharedState(const BrowserSharedState& other) = delete;
+  BrowserSharedState& operator=(const BrowserSharedState& other) = delete;
 };
 
 class WefClient : public CefClient,

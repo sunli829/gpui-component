@@ -27,7 +27,6 @@ struct WefSettings {
   const char* cache_path;
   const char* root_cache_path;
   const char* browser_subprocess_path;
-  bool external_message_pump;
   AppCallbacks callbacks;
   void* userdata;
   DestroyFn destroy_userdata;
@@ -69,14 +68,13 @@ extern "C" {
 bool wef_init(const WefSettings* wef_settings) {
   CefSettings settings;
   settings.windowless_rendering_enabled = true;
+  settings.external_message_pump = true;
 
 #ifdef __APPLE__
   settings.no_sandbox = false;
 #else
   settings.no_sandbox = true;
 #endif
-
-  settings.external_message_pump = wef_settings->external_message_pump;
 
   if (wef_settings->locale) {
     CefString(&settings.locale) = wef_settings->locale;
