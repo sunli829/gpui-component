@@ -6,6 +6,8 @@
 
 #include <iostream>
 #include <limits>
+#include <memory>
+#include <optional>
 
 #include "browser_callbacks.h"
 #include "frame.h"
@@ -15,6 +17,79 @@
 #include "utils.h"
 
 struct WefBrowser;
+
+enum class BrowserState {
+  Creating,
+  Created,
+  Closing,
+  Closed,
+};
+
+class BrowserCallbacksTarget {
+ private:
+  bool disable_;
+  BrowserCallbacks callbacks_;
+  void* userdata_;
+  DestroyFn destroy_userdata_;
+
+ public:
+  BrowserCallbacksTarget(BrowserCallbacks callbacks, void* userdata,
+                         DestroyFn destroy_userdata)
+      : disable_(false),
+        callbacks_(callbacks),
+        userdata_(userdata),
+        destroy_userdata_(destroy_userdata) {}
+
+  BrowserCallbacksTarget(const BrowserCallbacksTarget& other) = delete;
+
+  BrowserCallbacksTarget(BrowserCallbacksTarget&& other)
+      : disable_(other.disable_),
+        callbacks_(std::move(other.callbacks_)),
+        userdata_(other.userdata_),
+        destroy_userdata_(other.destroy_userdata_) {
+    other.disable_ = true;
+    other.userdata_ = nullptr;
+    other.destroy_userdata_ = nullptr;
+  }
+
+  ~BrowserCallbacksTarget() {
+    if (destroy_userdata_) {
+      destroy_userdata_(userdata_);
+    }
+  }
+
+  void disable() { disable_ = true; }
+
+  template <typename Callable>
+  void call(Callable func) const {
+    if (disable_) {
+      return;
+    }
+    func(callbacks_, userdata_);
+  }
+};
+
+struct BrowserSharedState {
+  bool focus;
+  int cursorX, cursorY;
+  BrowserState browser_state;
+  std::optional<CefRefPtr<CefBrowser>> browser;
+  int width, height;
+  float device_scale_factor;
+  BrowserCallbacksTarget callbacks_target;
+
+  BrowserSharedState(BrowserCallbacksTarget&& other)
+      : focus(false),
+        cursorX(0),
+        cursorY(0),
+        browser_state(BrowserState::Creating),
+        width(800),
+        height(600),
+        device_scale_factor(1.0f),
+        callbacks_target(std::move(other)) {}
+
+  BrowserSharedState(const BrowserSharedState& other) = delete;
+};
 
 class WefClient : public CefClient,
                   public CefRenderHandler,
@@ -32,29 +107,13 @@ class WefClient : public CefClient,
   IMPLEMENT_REFCOUNTING(WefClient);
 
  private:
-  WefBrowser* wef_browser_;
-  int width_, height_;
-  float device_scale_factor_;
-  BrowserCallbacks callbacks_;
-  void* userdata_;
-  DestroyFn destroy_userdata_;
+  std::shared_ptr<BrowserSharedState> state_;
   CefRefPtr<CefMessageRouterBrowserSide> message_router_;
 
  public:
-  WefClient(WefBrowser* wef_browser, float device_scale_factor, int width,
-            int height, BrowserCallbacks callbacks, void* userdata,
-            DestroyFn destroy_userdata);
+  WefClient(std::shared_ptr<BrowserSharedState> state);
 
   virtual ~WefClient();
-
-  bool setSize(int width, int height) {
-    if (width_ == width && height_ == height) {
-      return false;
-    }
-    width_ = width;
-    height_ = height;
-    return true;
-  }
 
   /////////////////////////////////////////////////////////////////
   // CefClient methods
@@ -62,15 +121,16 @@ class WefClient : public CefClient,
 
   bool GetScreenInfo(CefRefPtr<CefBrowser> browser,
                      CefScreenInfo& screen_info) override {
-    screen_info.device_scale_factor = device_scale_factor_;
+    screen_info.device_scale_factor = state_->device_scale_factor;
     return true;
   }
 
   void GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect) override {
-    rect.Set(
-        0, 0,
-        static_cast<int>(static_cast<float>(width_) / device_scale_factor_),
-        static_cast<int>(static_cast<float>(height_) / device_scale_factor_));
+    rect.Set(0, 0,
+             static_cast<int>(static_cast<float>(state_->width) /
+                              state_->device_scale_factor),
+             static_cast<int>(static_cast<float>(state_->height) /
+                              state_->device_scale_factor));
   }
 
   CefRefPtr<CefRenderHandler> GetRenderHandler() override { return this; }

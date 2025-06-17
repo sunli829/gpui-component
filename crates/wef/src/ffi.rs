@@ -147,6 +147,8 @@ unsafe extern "C" {
         settings: *const CBrowserSettings,
     ) -> *mut wef_browser_t;
 
+    pub(crate) unsafe fn wef_browser_close(browser: *mut wef_browser_t);
+
     pub(crate) unsafe fn wef_browser_destroy(browser: *mut wef_browser_t);
 
     pub(crate) unsafe fn wef_browser_is_created(browser: *mut wef_browser_t) -> bool;
