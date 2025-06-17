@@ -6,10 +6,9 @@ pub trait ApplicationHandler: Send + Sync {
     /// Called from any thread when work has been scheduled for the browser
     /// process main (UI) thread.
     ///
-    /// This callback is used in combination with
-    /// [`crate::Settings::external_message_pump`] and
-    /// [`crate::do_message_work`] in cases where the CEF message loop must
-    /// be integrated into an existing application message loop.
+    /// This callback is used in combination with [`crate::do_message_work`] in
+    /// cases where the CEF message loop must be integrated into an existing
+    /// application message loop.
     ///
     /// This callback should schedule a [`crate::do_message_work`] call to
     /// happen on the main (UI) thread.
