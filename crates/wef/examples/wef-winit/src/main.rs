@@ -17,6 +17,10 @@ use winit::{
 
 type BoxError = Box<dyn std::error::Error>;
 
+enum UserEvent {
+    WefMesssagePump,
+}
+
 struct State {
     scale_factor: f32,
     browser: Browser,
@@ -72,7 +76,7 @@ impl App {
     }
 }
 
-impl ApplicationHandler for App {
+impl ApplicationHandler<UserEvent> for App {
     fn resumed(&mut self, event_loop: &ActiveEventLoop) {
         let window = event_loop
             .create_window(
@@ -82,6 +86,10 @@ impl ApplicationHandler for App {
         window.set_ime_allowed(true);
 
         self.state = Some(State::new(window).expect("create window"));
+    }
+
+    fn user_event(&mut self, _event_loop: &ActiveEventLoop, _event: UserEvent) {
+        wef::do_message_work();
     }
 
     fn window_event(
@@ -302,7 +310,21 @@ fn convert_key_modifiers(modifiers: Modifiers) -> KeyModifier {
 }
 
 fn run() -> Result<(), Box<dyn std::error::Error>> {
-    let event_loop = EventLoop::new()?;
+    let event_loop = EventLoop::<UserEvent>::with_user_event().build()?;
+    let event_loop_proxy = event_loop.create_proxy();
+
+    std::thread::spawn(move || {
+        loop {
+            std::thread::sleep(std::time::Duration::from_millis(1000 / 60));
+            if event_loop_proxy
+                .send_event(UserEvent::WefMesssagePump)
+                .is_err()
+            {
+                break;
+            }
+        }
+    });
+
     let mut app = App::default();
     event_loop.run_app(&mut app)?;
     Ok(())

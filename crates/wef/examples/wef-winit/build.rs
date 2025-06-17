@@ -5,8 +5,9 @@ fn main() {
         embed_manifest(new_manifest("Wef.Example.Winit")).expect("unable to embed manifest file");
     }
 
-    #[cfg(target_os = "linux")]
-    println!("cargo:rustc-link-arg=-Wl,-rpath,$ORIGIN");
+    if cfg!(target_os = "linux") {
+        println!("cargo:rustc-link-arg=-Wl,-rpath,$ORIGIN");
+    }
 
     println!("cargo:rerun-if-changed=build.rs");
 }

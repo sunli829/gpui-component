@@ -16,7 +16,10 @@
 #include "include/cef_render_handler.h"
 #include "include/cef_task.h"
 #include "include/wrapper/cef_closure_task.h"
-#include "shutdown_helper.h"
+
+#if defined(_WIN32) || defined(_WIN64)
+#define NOMINMAX
+#endif
 
 const uint32_t ALL_MOUSE_BUTTONS = EVENTFLAG_LEFT_MOUSE_BUTTON;
 
@@ -25,6 +28,10 @@ struct WefSettings {
   const char* cache_path;
   const char* root_cache_path;
   const char* browser_subprocess_path;
+  bool external_message_pump;
+  AppCallbacks callbacks;
+  void* userdata;
+  DestroyFn destroy_userdata;
 };
 
 struct WefBrowserSettings {
@@ -66,7 +73,7 @@ bool wef_init(const WefSettings* wef_settings) {
   settings.no_sandbox = true;
 #endif
 
-  settings.external_message_pump = true;
+  settings.external_message_pump = wef_settings->external_message_pump;
 
   if (wef_settings->locale) {
     CefString(&settings.locale) = wef_settings->locale;
@@ -85,7 +92,9 @@ bool wef_init(const WefSettings* wef_settings) {
         wef_settings->browser_subprocess_path;
   }
 
-  CefRefPtr<WefApp> app(new WefApp());
+  CefRefPtr<WefApp> app(new WefApp(wef_settings->callbacks,
+                                   wef_settings->userdata,
+                                   wef_settings->destroy_userdata));
   return CefInitialize(CefMainArgs(), settings, app, nullptr);
 }
 
@@ -100,10 +109,9 @@ bool wef_exec_process(char* argv[], int argc) {
   return CefExecuteProcess(args, app, nullptr) >= 0;
 }
 
-void wef_shutdown() {
-  ShutdownHelper::getSingleton()->shutdown();
-  CefShutdown();
-}
+void wef_shutdown() { CefShutdown(); }
+
+void wef_do_message_work() { CefDoMessageLoopWork(); }
 
 WefBrowser* wef_browser_create(const WefBrowserSettings* settings) {
   CefWindowInfo window_info;
@@ -133,7 +141,6 @@ WefBrowser* wef_browser_create(const WefBrowserSettings* settings) {
   wef_browser->cursorX = 0;
   wef_browser->cursorY = 0;
 
-  ShutdownHelper::getSingleton()->browserCreated();
   return wef_browser;
 }
 
@@ -141,7 +148,7 @@ void wef_browser_destroy(WefBrowser* browser) {
   if (browser->browser) {
     (*browser->browser)->GetHost()->CloseBrowser(false);
   } else {
-    browser->deleteBrowser = true;
+    browser->closeBrowser = true;
   }
 }
 
@@ -241,10 +248,11 @@ void wef_browser_send_mouse_click_event(WefBrowser* browser,
   }
 
   apply_key_modifiers(mouse_event.modifiers, modifiers);
+
   (*browser->browser)
       ->GetHost()
       ->SendMouseClickEvent(mouse_event, btn_type, mouse_up,
-                            std::min(click_count, 3));
+                            std::max(click_count, 3));
 }
 
 void wef_browser_send_mouse_move_event(WefBrowser* browser, int x, int y,
