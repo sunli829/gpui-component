@@ -1,6 +1,6 @@
-use std::ffi::{CString, c_char, c_void};
+use std::ffi::{c_char, c_void, CString};
 
-use crate::{ApplicationHandler, Error, app_handler::ApplicationState, ffi::*, settings::Settings};
+use crate::{app_handler::ApplicationState, ffi::*, settings::Settings, ApplicationHandler, Error};
 
 /// Initialize the CEF browser process.
 ///
@@ -117,7 +117,7 @@ pub fn shutdown() {
 /// use wef::Settings;
 ///
 /// fn main() {
-///     let settings = Settings::default();
+///     let settings = Settings::new();
 ///     wef::launch(settings, || {
 ///         // do something in the main process
 ///     });
