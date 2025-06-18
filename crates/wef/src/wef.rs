@@ -1,6 +1,6 @@
-use std::ffi::{c_char, c_void, CString};
+use std::ffi::{CString, c_char, c_void};
 
-use crate::{app_handler::ApplicationState, ffi::*, settings::Settings, ApplicationHandler, Error};
+use crate::{ApplicationHandler, Error, app_handler::ApplicationState, ffi::*, settings::Settings};
 
 /// Initialize the CEF browser process.
 ///
