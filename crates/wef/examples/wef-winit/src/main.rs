@@ -18,7 +18,7 @@ use winit::{
 type BoxError = Box<dyn std::error::Error>;
 
 enum UserEvent {
-    WefMesssagePump,
+    WefMessagePump,
     Exit,
 }
 
@@ -101,7 +101,7 @@ impl ApplicationHandler<UserEvent> for App {
 
     fn user_event(&mut self, event_loop: &ActiveEventLoop, event: UserEvent) {
         match event {
-            UserEvent::WefMesssagePump => wef::do_message_work(),
+            UserEvent::WefMessagePump => wef::do_message_work(),
             UserEvent::Exit => event_loop.exit(),
         }
     }
@@ -343,7 +343,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                 loop {
                     std::thread::sleep(Duration::from_millis(1000 / 60));
                     if event_loop_proxy
-                        .send_event(UserEvent::WefMesssagePump)
+                        .send_event(UserEvent::WefMessagePump)
                         .is_err()
                     {
                         break;
