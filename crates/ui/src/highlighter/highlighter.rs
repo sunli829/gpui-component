@@ -172,7 +172,7 @@ impl SyntaxHighlighter {
     ///
     /// https://github.com/tree-sitter/tree-sitter/blob/v0.25.5/highlight/src/lib.rs#L336
     fn build_combined_injections_query(lang: &str) -> Result<Self> {
-        let Some(config) = LanguageRegistry::instance().language(&lang) else {
+        let Some(config) = LanguageRegistry::singleton().language(&lang) else {
             return Err(anyhow!(
                 "language {:?} is not registered in `LanguageRegistry`",
                 lang
@@ -265,7 +265,7 @@ impl SyntaxHighlighter {
 
         let mut injection_queries = HashMap::new();
         for inj_language in config.injection_languages.iter() {
-            if let Some(inj_config) = LanguageRegistry::instance().language(&inj_language) {
+            if let Some(inj_config) = LanguageRegistry::singleton().language(&inj_language) {
                 match Query::new(&inj_config.language, &inj_config.highlights) {
                     Ok(q) => {
                         injection_queries.insert(inj_config.name.clone(), q);
@@ -447,7 +447,7 @@ impl SyntaxHighlighter {
         // FIXME: Avoid to_string.
         let content = content.to_string();
 
-        let Some(config) = LanguageRegistry::instance().language(injection_language) else {
+        let Some(config) = LanguageRegistry::singleton().language(injection_language) else {
             return cache;
         };
         let mut parser = Parser::new();

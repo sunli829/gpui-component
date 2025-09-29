@@ -465,7 +465,7 @@ pub struct LanguageRegistry {
 
 impl LanguageRegistry {
     /// Returns the singleton instance of the `LanguageRegistry` with default languages and themes.
-    pub fn instance() -> &'static LazyLock<LanguageRegistry> {
+    pub fn singleton() -> &'static LazyLock<LanguageRegistry> {
         static INSTANCE: LazyLock<LanguageRegistry> = LazyLock::new(|| LanguageRegistry {
             languages: Mutex::new(
                 languages::Language::all()
@@ -508,7 +508,7 @@ mod tests {
     #[test]
     fn test_registry() {
         use super::LanguageRegistry;
-        let registry = LanguageRegistry::instance();
+        let registry = LanguageRegistry::singleton();
 
         registry.register(
             "foo",

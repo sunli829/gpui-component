@@ -26,7 +26,7 @@ use lsp_types::{
 use story::Assets;
 
 fn init() {
-    LanguageRegistry::instance().register(
+    LanguageRegistry::singleton().register(
         "navi",
         &LanguageConfig::new(
             "navi",
