@@ -441,7 +441,7 @@ impl Node {
     /// Combine all children, omitting the empt parent nodes.
     pub(super) fn compact(self) -> Node {
         match self {
-            Self::Root { mut children } if children.len() == 1 => children.remove(0),
+            Self::Root { mut children } if children.len() == 1 => children.remove(0).compact(),
             _ => self,
         }
     }
