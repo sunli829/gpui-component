@@ -346,8 +346,9 @@ impl CodeBlock {
 
     pub(super) fn selected_text(&self) -> String {
         let mut text = String::new();
-        if let Some(selection) = &self.state.lock().unwrap().selection {
-            let part_text = self.state.lock().unwrap().text.clone();
+        let state = self.state.lock().unwrap();
+        if let Some(selection) = &state.selection {
+            let part_text = state.text.clone();
             text.push_str(&part_text[selection.start..selection.end]);
         }
         text
