@@ -7,8 +7,8 @@ use crate::{
 use gpui::{
     div, prelude::FluentBuilder as _, px, relative, Action, AnyElement, App, ClickEvent, Corners,
     Div, Edges, ElementId, Hsla, InteractiveElement, Interactivity, IntoElement, ParentElement,
-    Pixels, RenderOnce, SharedString, StatefulInteractiveElement as _, StyleRefinement, Styled,
-    Window,
+    Pixels, RenderOnce, SharedString, Stateful, StatefulInteractiveElement as _, StyleRefinement,
+    Styled, Window,
 };
 
 #[derive(Default, Clone, Copy)]
@@ -182,7 +182,7 @@ impl ButtonVariant {
 #[derive(IntoElement)]
 pub struct Button {
     id: ElementId,
-    base: Div,
+    base: Stateful<Div>,
     style: StyleRefinement,
     icon: Option<Icon>,
     label: Option<SharedString>,
@@ -201,6 +201,7 @@ pub struct Button {
         Option<(Rc<Box<dyn Action>>, Option<SharedString>)>,
     )>,
     on_click: Option<Rc<dyn Fn(&ClickEvent, &mut Window, &mut App)>>,
+    on_hover: Option<Rc<dyn Fn(&bool, &mut Window, &mut App)>>,
     pub(crate) stop_propagation: bool,
     loading: bool,
     loading_icon: Option<Icon>,
@@ -217,9 +218,13 @@ impl From<Button> for AnyElement {
 
 impl Button {
     pub fn new(id: impl Into<ElementId>) -> Self {
+        let id = id.into();
+
         Self {
-            id: id.into(),
-            base: div().flex_shrink_0(),
+            id: id.clone(),
+            // ID must be set after div is created;
+            // `popup_menu` uses this id to create the popup menu.
+            base: div().flex_shrink_0().id(id),
             style: StyleRefinement::default(),
             icon: None,
             label: None,
@@ -232,6 +237,7 @@ impl Button {
             size: Size::Medium,
             tooltip: None,
             on_click: None,
+            on_hover: None,
             stop_propagation: true,
             loading: false,
             compact: false,
@@ -318,6 +324,12 @@ impl Button {
         handler: impl Fn(&ClickEvent, &mut Window, &mut App) + 'static,
     ) -> Self {
         self.on_click = Some(Rc::new(handler));
+        self
+    }
+
+    /// Add hover handler, the bool parameter indicates whether the mouse is hovering.
+    pub fn on_hover(mut self, handler: impl Fn(&bool, &mut Window, &mut App) + 'static) -> Self {
+        self.on_hover = Some(Rc::new(handler));
         self
     }
 
@@ -415,7 +427,6 @@ impl RenderOnce for Button {
         let is_focused = focus_handle.is_focused(window);
 
         self.base
-            .id(self.id.clone())
             .when(!self.disabled, |this| {
                 this.track_focus(
                     &focus_handle
@@ -423,7 +434,6 @@ impl RenderOnce for Button {
                         .tab_stop(self.tab_stop),
                 )
             })
-            .flex_shrink_0()
             .cursor_default()
             .flex()
             .flex_shrink_0()
@@ -524,6 +534,11 @@ impl RenderOnce for Button {
                     (on_click)(event, window, cx);
                 })
             })
+            .when_some(self.on_hover.filter(|_| clickable), |this, on_hover| {
+                this.on_hover(move |hovered, window, cx| {
+                    (on_hover)(hovered, window, cx);
+                })
+            })
             .when(self.disabled, |this| {
                 let disabled_style = style.disabled(self.outline, cx);
                 this.bg(disabled_style.bg)
@@ -534,7 +549,6 @@ impl RenderOnce for Button {
             .child({
                 h_flex()
                     .id("label")
-                    .overflow_hidden()
                     .items_center()
                     .justify_center()
                     .button_text_size(self.size)

@@ -248,11 +248,11 @@ impl RenderOnce for TextInput {
         let bg = if state.disabled {
             cx.theme().muted
         } else {
-            cx.theme()
-                .highlight_theme
-                .style
-                .background
-                .unwrap_or(cx.theme().background)
+            if state.mode.is_code_editor() {
+                cx.theme().editor_background()
+            } else {
+                cx.theme().background
+            }
         };
 
         let prefix = self.prefix;
@@ -402,6 +402,7 @@ impl RenderOnce for TextInput {
                                 move |_, window, cx| {
                                     state.update(cx, |state, cx| {
                                         state.clean(window, cx);
+                                        state.focus(window, cx);
                                     })
                                 }
                             }))
